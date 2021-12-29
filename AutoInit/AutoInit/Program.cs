@@ -1,6 +1,4 @@
 ﻿using Konsole;
-using Konsole.Forms;
-using Konsole.Internal;
 using NAudio.Wave;
 using System;
 using System.Diagnostics;
@@ -94,7 +92,21 @@ namespace AutoInit
                     }
                 });
 
-            Intro.StartIntro();
+                // Check args
+                if (args != null || args.Length != 0)
+                {
+                    if (args.Length == 1)
+                    {
+                        string arg = args[0];
+                        if (args[0] == "--no-intro")
+                        {
+                            Entry();
+                            Environment.Exit(0);
+                        }
+                    }
+                }
+
+                Intro.StartIntro();
                 Entry();
             }
 
@@ -206,6 +218,7 @@ namespace AutoInit
                             {
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Remove Bloatware ...");
 
+                                /* 
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Extracting script ...");
                                 writer.Flush();
 
@@ -259,6 +272,317 @@ namespace AutoInit
                                     removeBloadware = false;
                                     break;
                                 }
+                                */
+
+                                int statuscode;
+
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing App Connector ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Appconnector");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Cortana ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.549981C3F5F10");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Get Help ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.GetHelp");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Tips app ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Getstarted");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Messaging ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Messaging");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Mixed Reality Portal ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.MixedReality.Portal");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Feedback Hub ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsFeedbackHub");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Alarms ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsAlarms");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Camera ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsCamera");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Maps ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsMaps");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Minecraft for Windows 10 Edition ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.MinecraftUWP");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing People ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.People");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Print3D...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Print3D");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Mobile Plans ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.OneConnect");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Microsoft Solitaire Collection ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.MicrosoftSolitaireCollection");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Sticky Notes ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.MicrosoftStickyNotes");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing GroupMe ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.GroupMe10");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Voice Recorder ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsSoundRecorder");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing 3D Builder ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.3DBuilder");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing 3D Viewer ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Microsoft3DViewer");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN Weather ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingWeather");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN Sports ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingSports");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN News ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingNews");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN Finance ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingFinance");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing My Office ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.MicrosoftOfficeHub");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Office OneNote ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Office.OneNote");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Sway ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Office.Sway");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox App ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxApp");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Live in-game experience ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Xbox.TCUI");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Game Bar ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxGamingOverlay");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Game Bar Plugin ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxGameOverlay");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Identity Provider ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxIdentityProvider");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Speech to Text Overlay ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxSpeechToTextOverlay");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Network Speedtest ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.NetworkSpeedTest");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing To Do app ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Todos");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Shazam ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("ShazamEntertainmentLtd.Shazam");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Candy Crush ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("king.com.CandyCrushSaga");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                statuscode = AppxRemove.RemoveAppx("king.com.CandyCrushSodaSaga");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Flipboard ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Flipboard.Flipboard");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Twitter ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("9E2F88E3.Twitter");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing iHeartRadio ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("ClearChannelRadioDigital.iHeartRadio");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Duolingo ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("D5EA27B7.Duolingo-LearnLanguagesforFree");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Photoshop Express ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("AdobeSystemIncorporated.AdobePhotoshop");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Pandora ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("PandoraMediaInc.29680B314EFC2");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Eclipse Manager ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("46928bounde.EclipseManager");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Code Writer ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("ActiproSoftwareLLC.562882FEEB491");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Spotify ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("SpotifyAB.SpotifyMusic");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Your Phone Companion ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsPhone");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.Windows.Phone");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Communications - Phone app ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.CommsPhone");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Your Phone ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.YourPhone");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Remote Desktop app ...");
+                                writer.Flush();
+                                statuscode = AppxRemove.RemoveAppx("Microsoft.RemoteDesktop");
+                                if (statuscode != 0)
+                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
+                                // ---------------------------------------------------------------------------
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Bloatware removed!");
                                 removeBloadware = false;
