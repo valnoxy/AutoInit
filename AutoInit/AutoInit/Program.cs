@@ -17,6 +17,7 @@ namespace AutoInit
             static bool switchToAdmin = false;
             static bool removeBloadware = false;
             static bool installApplications = false;
+            static bool reinstallWindows = false;
 
             static string MusicDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Music");
 
@@ -127,6 +128,8 @@ namespace AutoInit
 
             public static void Entry()
             {
+                int windows_counter = 0;
+
                 using var writer = new HighSpeedWriter();
                 var window = new Window(writer);
 
@@ -217,63 +220,6 @@ namespace AutoInit
                             while (removeBloadware && !finished)
                             {
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Remove Bloatware ...");
-
-                                /* 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Extracting script ...");
-                                writer.Flush();
-
-                                string tempfile = Path.GetTempFileName();
-                                try
-                                {
-                                    if (File.Exists(tempfile))
-                                        File.Delete(tempfile);
-                                    File.WriteAllText(tempfile, Scripts.RemoveBloatware);
-                                    string newTempFile = Path.ChangeExtension(tempfile, ".bat");
-                                    File.Move(tempfile, newTempFile);
-                                    tempfile = newTempFile;
-                                }
-                                catch (Exception ex)
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot extract script! Error: {ex}");
-                                    writer.Flush();
-                                    removeBloadware = false;
-                                    break;
-                                }
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Running script ...");
-                                writer.Flush();
-                                Process p = new Process();
-                                p.StartInfo.FileName = "cmd.exe";
-                                p.StartInfo.Arguments = $"/c {tempfile}";
-                                p.StartInfo.UseShellExecute = false;
-                                p.StartInfo.CreateNoWindow = true;
-                                p.Start();
-                                p.WaitForExit();
-
-                                if (p.ExitCode != 0)
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot run script! Error: {p.ExitCode}");
-                                    writer.Flush();
-                                    removeBloadware = false;
-                                    break;
-                                }
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Cleaning up ...");
-                                writer.Flush();
-
-                                try
-                                {
-                                    File.Delete(tempfile);
-                                }
-                                catch
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot remove script! Error: {p.ExitCode}");
-                                    writer.Flush();
-                                    removeBloadware = false;
-                                    break;
-                                }
-                                */
-
                                 int statuscode;
 
                                 // ---------------------------------------------------------------------------
@@ -650,7 +596,7 @@ namespace AutoInit
                                     writer.Flush();
                                     try
                                     {
-                                        WebClient rms = new WebClient();
+                                        WebClient rms = new();
                                         string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
                                         string rmsFN = Path.Combine(publicDesktop, "Fernwartung Wolkenhof.exe");
                                         rms.DownloadFile(RemoteMaintenance, rmsFN) ;
@@ -691,6 +637,17 @@ namespace AutoInit
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Applications installed!");
                                 installApplications = false;
                                 writer.Flush();
+                            }
+                        }
+                        else if (reinstallWindows)
+                        {
+                            while (switchToAdmin && !finished)
+                            {
+                                statusCon.WriteLine(ConsoleColor.Cyan, "[i] Reinstall Windows ...");
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Downloading recovery image ...");
+                                writer.Flush();
+
+                                
                             }
                         }
                         else
@@ -753,6 +710,24 @@ namespace AutoInit
                         installApplications = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Mute / Play Music ");
+                    }),
+                    new MenuItem('W', "Reinstall Windows", () =>
+                    {
+                        windows_counter++;
+                        if (windows_counter != 2)
+                        {
+                            statusCon.WriteLine(ConsoleColor.Red, "[!] WARNING! This operation will reinstall Windows.");
+                            statusCon.WriteLine(ConsoleColor.Red, "    Press again if you want to perform this action!");
+                        } 
+                        else
+                        {
+                            switchToAdmin = false;
+                            removeBloadware = false;
+                            installApplications = false;
+                            reinstallWindows = true;
+                            status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
+                            status.WriteLine(ConsoleColor.Red, $" Reinstall Windows ");
+                        }
                     })
                 );
 

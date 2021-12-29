@@ -6,11 +6,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Company>Wolkenhof</Company>
     <Authors>Jonas Günner</Authors>
-    <Copyright>Copyright (c) 2018 - 2021 valnoxy. All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2018 - 2022 valnoxy. All rights reserved.</Copyright>
     <PackageProjectUrl>https://valnoxy.dev</PackageProjectUrl>
     <ApplicationIcon>AutoInit.ico</ApplicationIcon>
 	<StartupObject />
-	<Version>1.1.0</Version>
+	<Version>1.1.0</Version> 
+	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>

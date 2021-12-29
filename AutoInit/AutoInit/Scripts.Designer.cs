@@ -62,24 +62,21 @@ namespace AutoInit {
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die @echo off
-        ///:: https://privacy.sexy — v0.10.3 — Wed, 20 Oct 2021 06:56:24 GMT
-        ///:: Ensure admin privileges
-        ///fltmc &gt;nul 2&gt;&amp;1 || (
-        ///    echo Administrator privileges are required.
-        ///    PowerShell Start -Verb RunAs &apos;%0&apos; 2&gt; nul || (
-        ///        echo Right-click on the script and select &quot;Run as administrator&quot;.
-        ///        pause &amp; exit 1
-        ///    )
-        ///    exit 0
-        ///)
-        ///echo -------- Removing the following apps --------
-        ///echo.
-        ///:: ----------------------------------------------------------
-        ///:: --------------------App Connector app--------------- [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
+        ///echo EXPL_COPY_BOOT
+        ///copy /y %1 C:\AutoInit\deploya.wim
+        ///copy /y %2 C:\AutoInit\boot.sdi
+        ///echo EXPL_CREATE_BOOT
+        ///:: RAMDISK OPTION
+        ///%systemroot%\System32\bcdedit.exe /create {ramdiskoptions} /d &quot;AutoInit - Reinstall Windows&quot;
+        ///%systemroot%\System32\bcdedit.exe /set {ramdiskoptions} ramdisksdidevice partition=c:
+        ///%systemroot%\System32\bcdedit.exe /set {ramdiskoptions} ramdisksdipath \AutoInit\boot.sdi
+        ///
+        ///:: CREATE A NEW BOOT ENTRY FOR RETIRE UTILITY
+        ///for /f &quot;tokens=3&quot; %%A in (&apos;%systemroot%\System32 [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
         /// </summary>
-        internal static string RemoveBloatware {
+        internal static string add_to_bootloader {
             get {
-                return ResourceManager.GetString("RemoveBloatware", resourceCulture);
+                return ResourceManager.GetString("add_to_bootloader", resourceCulture);
             }
         }
     }

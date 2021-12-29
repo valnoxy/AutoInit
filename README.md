@@ -1,4 +1,4 @@
-<h1 align="center"><br><img src="https://dl.exploitox.de/other/AutoInit.png" alt="WhatsApp Desktop Dark Mode" width=175px></h1>
+<h1 align="center"><br><img src="https://dl.exploitox.de/other/AutoInit.png" alt="AutoInit Logo" width=175px></h1>
 
 <h3 align="center">AutoInit</h3>
 <p align="center">
@@ -26,6 +26,7 @@ AutoInit is a little application for initializing a Windows machine without Imag
 - Remove Bloatware apps that are shipped with Windows.
 - Install applications like Firefox, Adobe Reader and Remote Management Control with winget.
 - Plays music when opening the application (Typical music from cracking software).
+- Clean reinstall Windows without CD/USB.
 
 ⚠ **This tool is designed to use in a internal environment. If you want to use this tool as a "template" or just for testing, you will need to compile it for yourself.**
 
