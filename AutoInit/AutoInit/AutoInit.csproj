@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Company>Wolkenhof</Company>
+    <Authors>Jonas Günner</Authors>
+    <Copyright>Copyright (c) 2018 - 2021 valnoxy. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://valnoxy.dev</PackageProjectUrl>
+    <ApplicationIcon>AutoInit.ico</ApplicationIcon>
+	<StartupObject />
+	<Version>1.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="AutoInit.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
+    <PackageReference Include="NAudio" Version="2.0.1" />
+    <PackageReference Include="System.Management.Automation" Version="7.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Scripts.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Scripts.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Scripts.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Scripts.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
