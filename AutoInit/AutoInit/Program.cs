@@ -665,13 +665,13 @@ namespace AutoInit
                     info.WriteLine($"\nAdministrator Password:\n{AdminPW}\n\n\n\nPress up and down to select.\nPress ESC to exit.");
                     matrix.ForegroundColor = ConsoleColor.Green;
                     matrix.WriteLine(@"");
-                    matrix.WriteLine(@"     |             /  |");
-                    matrix.WriteLine(@"     /__   Y  __  (  _/");
-                    matrix.WriteLine(@"     \`--`-'-|`---\\/");
-                    matrix.WriteLine(@"      |'__/   ` __/ |");
-                    matrix.WriteLine(@"      '-.   w   ,--/");
-                    matrix.WriteLine(@"        |'_._._/  /");
-                    matrix.WriteLine(@"        |________/");
+                    matrix.WriteLine(@"     |             /  |  ");
+                    matrix.WriteLine(@"     /__   Y  __  (  _/  ");
+                    matrix.WriteLine(@"     \`--`-'-|`---\\/    ");
+                    matrix.WriteLine(@"      |'__/   ` __/ |    ");
+                    matrix.WriteLine(@"      '-.   w   ,--/     ");
+                    matrix.WriteLine(@"        |'_._._/  /      ");
+                    matrix.WriteLine(@"        |________/       ");
                     
                 });
 
