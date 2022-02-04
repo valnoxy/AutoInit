@@ -17,6 +17,7 @@ namespace AutoInit
             static bool switchToAdmin = false;
             static bool removeBloadware = false;
             static bool installApplications = false;
+            static bool configureWindows = false;
             static bool reinstallWindows = false;
 
             static string MusicDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Music");
@@ -641,13 +642,43 @@ namespace AutoInit
                         }
                         else if (reinstallWindows)
                         {
-                            while (switchToAdmin && !finished)
+                            while (reinstallWindows && !finished)
                             {
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Reinstall Windows ...");
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Downloading recovery image ...");
                                 writer.Flush();
 
                                 
+                            }
+                        }
+                        else if (configureWindows)
+                        {
+                            while (configureWindows && !finished)
+                            {
+                                statusCon.WriteLine(ConsoleColor.Cyan, "[i] Configure Windows Installation ...");
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Clean up task bar ...");                               // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Telemetry ...");                               // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Check activation state ...");                          // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable Microsoft Product Update via WU ...");          // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Clean up start menu ...");                             // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable auto reboot after BSOD ...");                  // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set max. memory dump to small ...");                   // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable System protection (max. Usage: 20%) ...");      // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set power plan to High ...");                          // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");                               // TODO
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Firefox Maintenance Tool ...");               // TODO
+
+                                writer.Flush();
                             }
                         }
                         else
@@ -684,6 +715,8 @@ namespace AutoInit
                         switchToAdmin = true;
                         removeBloadware = false;
                         installApplications = false;
+                        configureWindows = false;
+                        reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Switch to Administrator ");
                     }),
@@ -692,6 +725,8 @@ namespace AutoInit
                         switchToAdmin = false;
                         removeBloadware = true;
                         installApplications = false;
+                        configureWindows = false;
+                        reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Remove Bloatware ");
                     }),
@@ -700,14 +735,18 @@ namespace AutoInit
                         switchToAdmin = false;
                         removeBloadware = false;
                         installApplications = true;
+                        configureWindows = false;
+                        reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Install Applications ");
                     }),
-                    new MenuItem('m', "Mute / Play Music", () =>
+                    new MenuItem('c', "Configure Windows", () =>
                     {
                         switchToAdmin = false;
                         removeBloadware = false;
                         installApplications = false;
+                        configureWindows = true;
+                        reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Mute / Play Music ");
                     }),
@@ -724,6 +763,7 @@ namespace AutoInit
                             switchToAdmin = false;
                             removeBloadware = false;
                             installApplications = false;
+                            configureWindows = false;
                             reinstallWindows = true;
                             status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                             status.WriteLine(ConsoleColor.Red, $" Reinstall Windows ");
