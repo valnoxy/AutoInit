@@ -90,7 +90,17 @@ namespace AutoInit
                     {
                         var rand = new Random();
                         var files = Directory.GetFiles(MusicDir, "*.mp3");
-                        playSound(files[rand.Next(files.Length)]);
+                        try
+                        {
+                            playSound(files[rand.Next(files.Length)]);
+                        }
+                        catch
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("[!] Cannot play audio... skipping...");
+                            Thread.Sleep(2000);
+                            Console.ResetColor();
+                        }
                     }
                 });
 
