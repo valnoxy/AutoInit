@@ -657,8 +657,6 @@ namespace AutoInit
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Reinstall Windows ...");
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Downloading recovery image ...");
                                 writer.Flush();
-
-                                
                             }
                         }
                         else if (configureWindows)
@@ -750,7 +748,7 @@ namespace AutoInit
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Install Applications ");
                     }),
-                    new MenuItem('c', "Configure Windows", () =>
+                    new MenuItem('c', "Configure Windows (WIP)", () =>
                     {
                         switchToAdmin = false;
                         removeBloadware = false;
@@ -760,14 +758,14 @@ namespace AutoInit
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Mute / Play Music ");
                     }),
-                    new MenuItem('W', "Reinstall Windows", () =>
+                    new MenuItem('W', "Reinstall Windows (WIP)", () =>
                     {
                         windows_counter++;
                         if (windows_counter != 2)
                         {
                             statusCon.WriteLine(ConsoleColor.Red, "[!] WARNING! This operation will reinstall Windows.");
                             statusCon.WriteLine(ConsoleColor.Red, "    Press again if you want to perform this action!");
-                        } 
+                        }
                         else
                         {
                             switchToAdmin = false;
