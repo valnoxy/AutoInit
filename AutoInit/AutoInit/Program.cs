@@ -742,7 +742,7 @@ namespace AutoInit
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable System protection (max. Usage: 20%) ...");
                                 if (!ConfigureWindows.ShadowStorage())
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max Usage of System protection to 20%.");
                                     writer.Flush();
                                 }
 
@@ -760,7 +760,7 @@ namespace AutoInit
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");
                                 if (!ConfigureWindows.DisableFastBoot())
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot disable Fast Boot.");
                                     writer.Flush();
                                 }
 

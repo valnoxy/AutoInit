@@ -133,6 +133,7 @@ namespace AutoInit
             if (a != 0) status = false;
             return status;
         }
+
         #region Modules
         private static bool SetRegkey(string path, string name, string value)
         {
