@@ -664,27 +664,107 @@ namespace AutoInit
                             while (configureWindows && !finished)
                             {
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Configure Windows Installation ...");
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Clean up task bar ...");                               // TODO
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Telemetry ...");                               // TODO
+                                // ------------------------------------------------------------------------------------------------------------
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Check activation state ...");                          // TODO
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Disable Telemetry ...");
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable Microsoft Product Update via WU ...");          // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement (CEIP/SQM) ...");
+                                if (!ConfigureWindows.DisableCEI())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] CEI cannot be disabled.");
+                                    writer.Flush();
+                                }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Clean up start menu ...");                             // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Application Impact Telemetry (AIT) ...");
+                                if (!ConfigureWindows.DisableAIT())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] AIT cannot be disabled.");
+                                    writer.Flush();
+                                }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable auto reboot after BSOD ...");                  // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement Program ...");
+                                if (!ConfigureWindows.DisableCEIP())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled.");
+                                    writer.Flush();
+                                }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set max. memory dump to small ...");                   // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Telemetry in Data Collection Policy) ...");
+                                if (!ConfigureWindows.DisableDCP())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] DCP cannot be disabled.");
+                                    writer.Flush();
+                                }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable System protection (max. Usage: 20%) ...");      // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> License Telemetry ...");
+                                if (!ConfigureWindows.DisableLicenseTel())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] TLT cannot be disabled. Error while writing into Registry.");
+                                    writer.Flush();
+                                }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set power plan to High ...");                          // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Devicesensus Telemetry Task...");
+                                if (!ConfigureWindows.DisableDeviceSensus())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled. Error while writing into Registry.");
+                                    writer.Flush();
+                                }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");                               // TODO
+                                // ------------------------------------------------------------------------------------------------------------
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Firefox Maintenance Tool ...");               // TODO
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Check activation state ...");
+                                if (!ConfigureWindows.IsWindowsActivated())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Windows is not activated.");
+                                }
+
+                                // ------------------------------------------------------------------------------------------------------------
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable auto reboot after BSOD ...");
+                                if (!ConfigureWindows.DisableAutoRebootOnBSOD())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Auto Reboot cannot be disabled.");
+                                    writer.Flush();
+                                }
+
+                                // ------------------------------------------------------------------------------------------------------------
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set max. memory dump to small ...");
+                                if (!ConfigureWindows.SetMaxMemDump())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max. memory dump to small.");
+                                    writer.Flush();
+                                }
+
+                                // ------------------------------------------------------------------------------------------------------------
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable System protection (max. Usage: 20%) ...");
+                                if (!ConfigureWindows.ShadowStorage())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                    writer.Flush();
+                                }
+
+                                // ------------------------------------------------------------------------------------------------------------
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set power plan to High Performance ...");
+                                if (!ConfigureWindows.SetMaxPerformance())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set power plan to High Performance");
+                                    writer.Flush();
+                                }
+
+                                // ------------------------------------------------------------------------------------------------------------
+
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");
+                                if (!ConfigureWindows.DisableFastBoot())
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                    writer.Flush();
+                                }
+
+                                // ------------------------------------------------------------------------------------------------------------
 
                                 writer.Flush();
                             }
@@ -748,7 +828,7 @@ namespace AutoInit
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Install Applications ");
                     }),
-                    new MenuItem('c', "Configure Windows (WIP)", () =>
+                    new MenuItem('c', "Configure Windows", () =>
                     {
                         switchToAdmin = false;
                         removeBloadware = false;
@@ -756,7 +836,7 @@ namespace AutoInit
                         configureWindows = true;
                         reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
-                        status.WriteLine(ConsoleColor.Red, $" Mute / Play Music ");
+                        status.WriteLine(ConsoleColor.Red, $" Configure Windows ");
                     }),
                     new MenuItem('W', "Reinstall Windows (WIP)", () =>
                     {
