@@ -828,12 +828,13 @@ namespace AutoInit
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Install Applications ");
                     }),
-                    new MenuItem('c', "Configure Windows", () =>
+                    new MenuItem('c', "Configure Windows (WIP)", () =>
                     {
                         switchToAdmin = false;
                         removeBloadware = false;
                         installApplications = false;
-                        configureWindows = true;
+                        configureWindows = false;
+#warning Replace "false" with "true"!
                         reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Configure Windows ");
