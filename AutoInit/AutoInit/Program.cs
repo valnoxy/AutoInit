@@ -828,7 +828,7 @@ namespace AutoInit
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Install Applications ");
                     }),
-                    new MenuItem('c', "Configure Windows (WIP)", () =>
+                    new MenuItem('c', "Configure Windows (WIP - not working)", () =>
                     {
                         switchToAdmin = false;
                         removeBloadware = false;
@@ -839,7 +839,7 @@ namespace AutoInit
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Configure Windows ");
                     }),
-                    new MenuItem('W', "Reinstall Windows (WIP)", () =>
+                    new MenuItem('W', "Reinstall Windows (WIP - not working)", () =>
                     {
                         windows_counter++;
                         if (windows_counter != 2)
