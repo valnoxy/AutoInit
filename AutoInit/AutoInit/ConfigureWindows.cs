@@ -80,6 +80,7 @@ namespace AutoInit
         }
         #endregion
 
+        #region System check
         public static bool IsWindowsActivated()
         {
             ManagementScope scope = new ManagementScope(@"\\" + System.Environment.MachineName + @"\root\cimv2");
@@ -93,7 +94,9 @@ namespace AutoInit
                 return obj.Count > 0;
             }
         }
+        #endregion
 
+        #region Tweaks
         public static bool DisableAutoRebootOnBSOD()
         {
             bool status = true;
@@ -133,6 +136,7 @@ namespace AutoInit
             if (a != 0) status = false;
             return status;
         }
+        #endregion
 
         #region Modules
         private static bool SetRegkey(string path, string name, string value)

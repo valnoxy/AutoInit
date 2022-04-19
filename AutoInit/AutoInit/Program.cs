@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -575,7 +576,7 @@ namespace AutoInit
                                     p.Start();
                                     p.WaitForExit();
                                     p.StartInfo.UseShellExecute = false;
-                                    p.StartInfo.CreateNoWindow = true;   
+                                    p.StartInfo.CreateNoWindow = true;
 
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Firefox ...");
                                     writer.Flush();
@@ -610,7 +611,7 @@ namespace AutoInit
                                         WebClient rms = new();
                                         string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
                                         string rmsFN = Path.Combine(publicDesktop, "Fernwartung Wolkenhof.exe");
-                                        rms.DownloadFile(RemoteMaintenance, rmsFN) ;
+                                        rms.DownloadFile(RemoteMaintenance, rmsFN);
                                     }
                                     catch
                                     {
@@ -669,12 +670,16 @@ namespace AutoInit
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Disable Telemetry ...");
 
+                                // ------------------------------------------------------------------------------------------------------------
+
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement (CEIP/SQM) ...");
                                 if (!ConfigureWindows.DisableCEI())
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] CEI cannot be disabled.");
                                     writer.Flush();
                                 }
+
+                                // ------------------------------------------------------------------------------------------------------------
 
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Application Impact Telemetry (AIT) ...");
                                 if (!ConfigureWindows.DisableAIT())
@@ -683,12 +688,16 @@ namespace AutoInit
                                     writer.Flush();
                                 }
 
+                                // ------------------------------------------------------------------------------------------------------------
+
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement Program ...");
                                 if (!ConfigureWindows.DisableCEIP())
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled.");
                                     writer.Flush();
                                 }
+
+                                // ------------------------------------------------------------------------------------------------------------
 
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Telemetry in Data Collection Policy) ...");
                                 if (!ConfigureWindows.DisableDCP())
@@ -697,12 +706,16 @@ namespace AutoInit
                                     writer.Flush();
                                 }
 
+                                // ------------------------------------------------------------------------------------------------------------
+
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> License Telemetry ...");
                                 if (!ConfigureWindows.DisableLicenseTel())
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] TLT cannot be disabled. Error while writing into Registry.");
                                     writer.Flush();
                                 }
+
+                                // ------------------------------------------------------------------------------------------------------------
 
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Devicesensus Telemetry Task...");
                                 if (!ConfigureWindows.DisableDeviceSensus())
@@ -713,11 +726,19 @@ namespace AutoInit
 
                                 // ------------------------------------------------------------------------------------------------------------
 
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Checking system ...");
+
+                                // ------------------------------------------------------------------------------------------------------------
+
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Check activation state ...");
                                 if (!ConfigureWindows.IsWindowsActivated())
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] Windows is not activated.");
                                 }
+
+                                // ------------------------------------------------------------------------------------------------------------
+
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Tweaking Windows ...");
 
                                 // ------------------------------------------------------------------------------------------------------------
 
@@ -791,7 +812,7 @@ namespace AutoInit
                     matrix.WriteLine(@"      '-.   w   ,--/     ");
                     matrix.WriteLine(@"        |'_._._/  /      ");
                     matrix.WriteLine(@"        |________/       ");
-                    
+
                 });
 
                 // create a menu inside the menu console window
@@ -833,8 +854,7 @@ namespace AutoInit
                         switchToAdmin = false;
                         removeBloadware = false;
                         installApplications = false;
-                        configureWindows = false;
-#warning Replace "false" with "true"!
+                        configureWindows = true;
                         reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Configure Windows ");
