@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Diagnostics;
 using System.Management;
+using static AutoInit.Program.AutoInit;
 
 namespace AutoInit
 {
@@ -108,7 +109,20 @@ namespace AutoInit
         public static bool SetMaxMemDump()
         {
             bool status = true;
-            int a = RunProcess("wmic.exe", "recoveros set DebugInfoType = 3"); 
+            string DebugInfoType = "";
+
+            if (Configuration.SPMaxMemoryDump == "None")
+                DebugInfoType = "0";
+            else if (Configuration.SPMaxMemoryDump == "Complete")
+                DebugInfoType = "1";
+            else if (Configuration.SPMaxMemoryDump == "Kernel")
+                DebugInfoType = "2";
+            else if (Configuration.SPMaxMemoryDump == "Small")
+                DebugInfoType = "3";
+            else if (Configuration.SPMaxMemoryDump == "Auto")
+                DebugInfoType = "7";
+
+            int a = RunProcess("wmic.exe", $"recoveros set DebugInfoType = {DebugInfoType}"); 
             if (a != 0) status = false;
             return status;
         }

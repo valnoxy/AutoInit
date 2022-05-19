@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
-    <PackageReference Include="NAudio" Version="2.0.1" />
-    <PackageReference Include="System.Management.Automation" Version="7.2.1" />
+    <PackageReference Include="NAudio" Version="2.1.0" />
+    <PackageReference Include="System.Management.Automation" Version="7.2.4" />
   </ItemGroup>
 
   <ItemGroup>

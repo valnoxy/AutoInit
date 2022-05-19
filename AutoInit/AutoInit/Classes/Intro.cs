@@ -25,7 +25,7 @@ namespace AutoInit
                 if (t <= 2) return (char)('0' + randomposition.Next(10));
                 else if (t <= 4) return (char)('a' + randomposition.Next(27));
                 else if (t <= 4) return (char)('A' + randomposition.Next(27));
-                else return (char)(randomposition.Next(32, 255));
+                else return (char)randomposition.Next(32, 255);
             }    
         }
 
@@ -39,13 +39,13 @@ namespace AutoInit
             int width;
             int height;
             int[] y;
-            initialize(out width, out height, out y);
+            Initialize(out width, out height, out y);
 
             while (true)
             {
                 introtime++;
                 counter++;
-                columupdate(width, height, y);
+                Columupdate(width, height, y);
                 if (counter > (3 * flowspeed))
                     counter = 0;
                 if (introtime == 300)
@@ -60,7 +60,7 @@ namespace AutoInit
             else
                 return 0;
         }
-        private static void initialize(out int width, out int height, out int[] y)
+        private static void Initialize(out int width, out int height, out int[] y)
         {
             height = Console.WindowHeight;
             width = Console.WindowWidth - 1;
@@ -69,7 +69,7 @@ namespace AutoInit
 
             for (int x = 0; x < width; ++x) { y[x] = randomposition.Next(height); }
         }
-        private static void columupdate(int width, int height, int[] y)
+        private static void Columupdate(int width, int height, int[] y)
         {
             int x;
             if (counter < flowspeed)

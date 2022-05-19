@@ -14,6 +14,39 @@ namespace AutoInit
     {
         public static class AutoInit
         {
+            public class Configuration
+            {
+                public static string _ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
+
+                // AutoInit
+                public static string AdminPassword;
+                public static string DefaultUsername;
+                public static bool RemoveDefaultUser;
+                public static bool BackgroundMusic;
+
+                // Applications
+                public static string PackageID_Firefox;
+                public static string PackageID_AcrobatReader;
+                public static bool InstallFirefox;
+                public static bool InstallAcrobatReader;
+                public static bool EnableSMB1;
+                public static bool EnableNET35;
+                public static bool RemoteMaintenance;
+                public static string RemoteMaintenanceURL;
+                public static string RemoteMaintenanceFileName;
+                public static string OtherApps;
+
+                // Settings
+                public static bool DisableTelemetry;
+                public static bool CheckActivation;
+                public static string SystemProtection;
+                public static bool DisableAutoRebootAfterBSOD;
+                public static string SPMaxMemoryDump;
+                public static bool SetMaxPerformance;
+                public static bool DisableFastBoot;
+            }
+
+            // Main Menu switches
             static bool finished = false;
             static bool switchToAdmin = false;
             static bool removeBloadware = false;
@@ -21,103 +54,52 @@ namespace AutoInit
             static bool configureWindows = false;
             static bool reinstallWindows = false;
 
+            // Music directory
             static string MusicDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Music");
-
-            static string Config = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
-            static string AdminPW;
-            static string RemoteMaintenance;
-            static string PackageID_Firefox;
-            static string PackageID_AcrobatReader;
-            static string DotNet;
-            static string SMB;
 
             public static void Main(string[] args)
             {
                 // Inititalize log file
                 Logger.StartLogging();
 
-                // Configuation check
-                if (!File.Exists(Config))
+                // Verify the existance of the config file
+                if (!File.Exists(Configuration._ConfigurationFile))
                 {
                     Console.WriteLine("ERROR: No configuation file found. (File missing: config.ini)");
                     Logger.Log("ERROR: No configuation file found. (File missing: config.ini)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                
-                var ConfigIni = new IniFile(Config);
-                AdminPW = ConfigIni.Read("AdminPW");
-                RemoteMaintenance = ConfigIni.Read("RemoteMaintenance");
-                PackageID_Firefox = ConfigIni.Read("PackageID_Firefox");
-                PackageID_AcrobatReader = ConfigIni.Read("PackageID_AcrobatReader");
-                DotNet = ConfigIni.Read("DotNet");
-                SMB = ConfigIni.Read("SMB");
-                Logger.Log("Config loaded.");
 
-                if (AdminPW == "")
-                {
-                    Console.WriteLine("ERROR: Configuation file invalid. (No AdminPW set)");
-                    Logger.Log("ERROR: Configuation file invalid. (No AdminPW set)");
-                    Thread.Sleep(3);
-                    Environment.Exit(1);
-                }
-                if (RemoteMaintenance == "")
-                {
-                    Console.WriteLine("ERROR: Configuation file invalid. (No RemoteMaintenance set)");
-                    Logger.Log("ERROR: Configuation file invalid. (No RemoteMaintenance set)");
-                    Thread.Sleep(3);
-                    Environment.Exit(1);
-                }
-                if (PackageID_Firefox == "")
-                {
-                    Console.WriteLine("ERROR: Configuation file invalid. (No PackageID_Firefox set)");
-                    Logger.Log("ERROR: Configuation file invalid. (No PackageID_Firefox set)");
-                    Thread.Sleep(3);
-                    Environment.Exit(1);
-                }
-                if (PackageID_AcrobatReader == "")
-                {
-                    Console.WriteLine("ERROR: Configuation file invalid. (No PackageID_AcrobatReader set)");
-                    Logger.Log("ERROR: Configuation file invalid. (No PackageID_AcrobatReader set)");
-                    Thread.Sleep(3);
-                    Environment.Exit(1);
-                }
-                if (DotNet == "")
-                {
-                    Console.WriteLine("ERROR: Configuation file invalid. (No DotNet set)");
-                    Logger.Log("ERROR: Configuation file invalid. (No DotNet set)");
-                    Thread.Sleep(3);
-                    Environment.Exit(1);
-                }
-                if (SMB == "")
-                {
-                    Console.WriteLine("ERROR: Configuation file invalid. (No SMB set)");
-                    Logger.Log("ERROR: Configuation file invalid. (No SMB set)");
-                    Thread.Sleep(3);
-                    Environment.Exit(1);
-                }
+                // Check and load the Configuration file
+                InitConfiguration();
 
-                var music = Task.Run(() =>
+                // Initialize background music
+                if (Configuration.BackgroundMusic)
                 {
-                    if (Directory.Exists(MusicDir))
+                    var music = Task.Run(() =>
                     {
-                        var rand = new Random();
-                        var files = Directory.GetFiles(MusicDir, "*.mp3");
-                        try
+                        if (Directory.Exists(MusicDir))
                         {
-                            playSound(files[rand.Next(files.Length)]);
-                            Logger.Log("Playing some music.");
+                            var rand = new Random();
+                            var files = Directory.GetFiles(MusicDir, "*.mp3");
+                            try
+                            {
+                                playSound(files[rand.Next(files.Length)]);
+                                Logger.Log("Playing some music.");
+                            }
+                            catch
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("[!] Cannot play audio... skipping...");
+                                Logger.Log("Cannot play audio!");
+                                Thread.Sleep(2000);
+                                Console.ResetColor();
+                            }
                         }
-                        catch
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("[!] Cannot play audio... skipping...");
-                            Logger.Log("Cannot play audio!");
-                            Thread.Sleep(2000);
-                            Console.ResetColor();
-                        }
-                    }
-                });
+                    });
+                }
+
 
                 // Check args
                 if (args != null || args.Length != 0)
@@ -127,14 +109,222 @@ namespace AutoInit
                         string arg = args[0];
                         if (args[0] == "--no-intro")
                         {
-                            Entry();
+                            MainMenu();
+                            Environment.Exit(0);
+                        }
+
+                        if (args[0] == "--new-config")
+                        {
+                            string config = @"
+                                [AutoInit]
+                                AdminPassword = 
+
+                                ; Note that this user will be deleted (if not set otherwise) after the Administration switching phase.
+                                DefaultUsername = User
+                                RemoveDefaultUser = true
+
+                                BackgroundMusic = true
+
+                                [Application]
+                                PackageID_Firefox = Mozilla.Firefox
+                                PackageID_AcrobatReader = Adobe.Acrobat.Reader.64-bit
+                                InstallFirefox = true
+                                InstallAcrobatReader = true
+
+                                EnableSMB1 = true
+                                EnableNET35 = true
+
+                                RemoteMaintenance = true
+                                RemoteMaintenanceURL = https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe
+                                RemoteMaintenanceFileName = Fernwartung Wolkenhof.exe
+
+                                ; Install other apps by inserting the Package ID of the application.
+                                ; You can find the Package ID by typing 'winget search <Name>' or by searching on https://winget.run/
+                                ; Use ',' for more than one application
+                                OtherApps =  
+
+                                [Settings]
+                                DisableTelemetry = true
+                                CheckActivation = true
+
+                                ; System Protection
+                                ; Set to 0% to disable system protection
+                                SystemProtection = 20%
+                                DisableAutoRebootAfterBSOD = true
+
+                                ; Options:
+                                ;   None = None
+                                ;   Complete = Complete memory dump
+                                ;   Kernel = Kernel memory dump
+                                ;   Small = Small memory dump (64 KB)
+                                ;   Auto = Automatic memory dump
+                                SPMaxMemoryDump = Small
+
+                                ; Power Settings
+                                SetMaxPerformance = true
+                                DisableFastBoot = true
+
+                            ";
+                            try
+                            {
+                                File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini"), config);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"[!] Failed to create new config: {e.Message}");
+                                Environment.Exit(1);
+                            }
                             Environment.Exit(0);
                         }
                     }
                 }
 
                 Intro.StartIntro();
-                Entry();
+                MainMenu();
+            }
+
+            private static void InitConfiguration()
+            {
+                //
+                // Reading Configuration
+                //
+                var ConfigIni = new IniFile(Configuration._ConfigurationFile);
+                
+                Configuration.AdminPassword = ConfigIni.Read("AdminPassword", "AutoInit");
+                Configuration.DefaultUsername = ConfigIni.Read("DefaultUsername", "AutoInit");
+
+                if (ConfigIni.Read("RemoveDefaultUser", "AutoInit") == "true")
+                    Configuration.RemoveDefaultUser = true;
+                else
+                    Configuration.RemoveDefaultUser = false;
+
+                if (ConfigIni.Read("BackgroundMusic", "AutoInit") == "true")
+                    Configuration.BackgroundMusic = true;
+                else
+                    Configuration.BackgroundMusic = false;
+
+                Configuration.PackageID_AcrobatReader = ConfigIni.Read("PackageID_AcrobatReader", "Application");
+                Configuration.PackageID_Firefox = ConfigIni.Read("PackageID_Firefox", "Application");
+
+                if (ConfigIni.Read("InstallFirefox", "Application") == "true")
+                    Configuration.InstallFirefox = true;
+                else
+                    Configuration.InstallFirefox = false;
+
+                if (ConfigIni.Read("InstallAcrobatReader", "Application") == "true")
+                    Configuration.InstallAcrobatReader = true;
+                else
+                    Configuration.InstallAcrobatReader = false;
+
+                if (ConfigIni.Read("EnableSMB1", "Application") == "true")
+                    Configuration.EnableSMB1 = true;
+                else
+                    Configuration.EnableSMB1 = false;
+
+                if (ConfigIni.Read("EnableNET35", "Application") == "true")
+                    Configuration.EnableNET35 = true;
+                else
+                    Configuration.EnableNET35 = false;
+
+                if (ConfigIni.Read("RemoteMaintenance", "Application") == "true")
+                    Configuration.RemoteMaintenance = true;
+                else
+                    Configuration.RemoteMaintenance = false;
+
+                Configuration.RemoteMaintenanceURL = ConfigIni.Read("RemoteMaintenanceURL", "Application");
+                Configuration.RemoteMaintenanceFileName = ConfigIni.Read("RemoteMaintenanceFileName", "Application");
+                Configuration.OtherApps = ConfigIni.Read("OtherApps", "Application");
+
+                if (ConfigIni.Read("DisableTelemetry", "Settings") == "true")
+                    Configuration.DisableTelemetry = true;
+                else
+                    Configuration.DisableTelemetry = false;
+
+                if (ConfigIni.Read("CheckActivation", "Settings") == "true")
+                    Configuration.CheckActivation = true;
+                else
+                    Configuration.CheckActivation = false;
+
+                Configuration.SystemProtection = ConfigIni.Read("SystemProtection", "Settings");
+
+                if (ConfigIni.Read("DisableAutoRebootAfterBSOD", "Settings") == "true")
+                    Configuration.DisableAutoRebootAfterBSOD = true;
+                else
+                    Configuration.DisableAutoRebootAfterBSOD = false;
+
+                Configuration.SPMaxMemoryDump = ConfigIni.Read("SPMaxMemoryDump", "Settings");
+
+                if (ConfigIni.Read("SetMaxPerformance", "Settings") == "true")
+                    Configuration.SetMaxPerformance = true;
+                else
+                    Configuration.SetMaxPerformance = false;
+
+                if (ConfigIni.Read("DisableFastBoot", "Settings") == "true")
+                    Configuration.DisableFastBoot = true;
+                else
+                    Configuration.DisableFastBoot = false;
+
+                Logger.Log("Config loaded.");                
+                
+                //
+                // Validating Configuration
+                //
+                if (Configuration.AdminPassword == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No AdminPassword set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No AdminPassword set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.DefaultUsername == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No DefaultUsername set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No DefaultUsername set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.PackageID_Firefox == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No PackageID_Firefox set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No PackageID_Firefox set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.PackageID_AcrobatReader == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No PackageID_AcrobatReader set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No PackageID_AcrobatReader set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.RemoteMaintenanceURL == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No RemoteMaintenanceURL set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No RemoteMaintenanceURL set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.RemoteMaintenanceFileName == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No RemoteMaintenanceFileName set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No RemoteMaintenanceFileName set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.SystemProtection == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No SystemProtection set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No SystemProtection set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
+                if (Configuration.SPMaxMemoryDump == "")
+                {
+                    Console.WriteLine("ERROR: Configuation file invalid. (No SPMaxMemoryDump set)");
+                    Logger.Log("ERROR: Configuation file invalid. (No SPMaxMemoryDump set)");
+                    Thread.Sleep(3);
+                    Environment.Exit(1);
+                }
             }
 
             private static void playSound(string Filepath)
@@ -152,7 +342,7 @@ namespace AutoInit
                 }
             }
 
-            public static void Entry()
+            public static void MainMenu()
             {
                 int windows_counter = 0;
 
@@ -211,7 +401,7 @@ namespace AutoInit
 
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Change Administrator password ...");
                                 writer.Flush();
-                                p.StartInfo.Arguments = $"/c \"net user Administrator {AdminPW}\"";
+                                p.StartInfo.Arguments = $"/c \"net user Administrator {Configuration.AdminPassword}\"";
                                 p.Start();
                                 p.WaitForExit();
 
@@ -223,18 +413,21 @@ namespace AutoInit
                                     break;
                                 }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remove User account ...");
-                                writer.Flush();
-                                p.StartInfo.Arguments = $"/c \"net user User /delete\"";
-                                p.Start();
-                                p.WaitForExit();
-
-                                if (p.ExitCode != 0)
+                                if (Configuration.RemoveDefaultUser)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot delete User account! Error: {p.ExitCode}");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remove User account ...");
                                     writer.Flush();
-                                    switchToAdmin = false;
-                                    break;
+                                    p.StartInfo.Arguments = $"/c \"net user {Configuration.DefaultUsername} /delete\"";
+                                    p.Start();
+                                    p.WaitForExit();
+
+                                    if (p.ExitCode != 0)
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot delete account '{Configuration.DefaultUsername}'! Error: {p.ExitCode}");
+                                        writer.Flush();
+                                        switchToAdmin = false;
+                                        break;
+                                    }
                                 }
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Switched to admin!");
@@ -570,6 +763,7 @@ namespace AutoInit
                                 writer.Flush();
                                 Logger.Log("User requested to install applications.");
 
+                                // Check if winget is installed on the device
                                 Process p = new Process();
                                 p.StartInfo.FileName = "cmd.exe";
                                 p.StartInfo.Arguments = "/c winget";
@@ -587,94 +781,130 @@ namespace AutoInit
                                 }
                                 else
                                 {
-
+                                    // Begin installation
                                     statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Applications with WinGet ...");
                                     writer.Flush();
                                     Logger.Log("Installing Applications with WinGet ...");
 
+                                    // Prompt for accepting EULA
                                     p.StartInfo.Arguments = "/c winget list";
                                     p.Start();
                                     p.WaitForExit();
                                     p.StartInfo.UseShellExecute = false;
                                     p.StartInfo.CreateNoWindow = true;
 
-                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Firefox ...");
-                                    writer.Flush();
-                                    Logger.Log("Installing Firefox ...");
 
-                                    p.StartInfo.Arguments = $"/c winget install --id {PackageID_Firefox}";
-                                    p.Start();
-                                    p.WaitForExit();
-
-                                    if (p.ExitCode != 0)
+                                    if (Configuration.InstallFirefox)
                                     {
-                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> Firefox ...");
                                         writer.Flush();
-                                        Logger.Log($"Firefox cannot be installed. Error: {p.ExitCode}");
+                                        Logger.Log("Installing Firefox ...");
+
+                                        p.StartInfo.Arguments = $"/c winget install --id {Configuration.PackageID_Firefox}";
+                                        p.Start();
+                                        p.WaitForExit();
+
+                                        if (p.ExitCode != 0)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                            writer.Flush();
+                                            Logger.Log($"Firefox cannot be installed. Error: {p.ExitCode}");
+                                        }
                                     }
 
-                                    // ----------------------------------------------------------------------------
-                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Adobe Acrobat Reader DC ...");
-                                    writer.Flush();
-                                    Logger.Log("Installing Adobe Acrobat Reader DC ...");
+                                    if (Configuration.InstallAcrobatReader)
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> Adobe Acrobat Reader DC ...");
+                                        writer.Flush();
+                                        Logger.Log("Installing Adobe Acrobat Reader DC ...");
                                     
-                                    p.StartInfo.Arguments = $"/c winget install --id {PackageID_AcrobatReader}";
-                                    p.Start();
-                                    p.WaitForExit();
+                                        p.StartInfo.Arguments = $"/c winget install --id {Configuration.PackageID_AcrobatReader}";
+                                        p.Start();
+                                        p.WaitForExit();
 
-                                    if (p.ExitCode != 0)
+                                        if (p.ExitCode != 0)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Adobe Acrobat Reader DC cannot be installed. Error: {p.ExitCode}");
+                                            writer.Flush();
+                                            Logger.Log($"Adobe Acrobat Reader DC cannot be installed. Error: {p.ExitCode}");
+                                        }
+                                    }
+
+                                    if (!String.IsNullOrEmpty(Configuration.OtherApps))
                                     {
-                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Adobe Acrobat Reader DC cannot be installed. Error: {p.ExitCode}");
+                                        string[] otherapps = Configuration.OtherApps.Split(',');
+                                        foreach (string app in otherapps)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Yellow,$"    -> Application '{app}'");
+                                            writer.Flush();
+                                            Logger.Log($"Installing Application with PackageID '{app}' ...");
+
+                                            p.StartInfo.Arguments = $"/c winget install --id {app}";
+                                            p.Start();
+                                            p.WaitForExit();
+
+                                            if (p.ExitCode != 0)
+                                            {
+                                                statusCon.WriteLine(ConsoleColor.Red, $"[!] Application '{app}' cannot be installed. Error: {p.ExitCode}");
+                                                writer.Flush();
+                                                Logger.Log($"Application '{app}' cannot be installed. Error: {p.ExitCode}");
+                                            }
+                                        }
+                                    }
+
+                                    if (Configuration.RemoteMaintenance)
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remote maintenance software ...");
                                         writer.Flush();
-                                        Logger.Log($"Adobe Acrobat Reader DC cannot be installed. Error: {p.ExitCode}");
+                                        try
+                                        {
+                                            WebClient rms = new();
+                                            string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
+                                            string rmsFN = Path.Combine(publicDesktop, Configuration.RemoteMaintenanceFileName);
+                                            rms.DownloadFile(Configuration.RemoteMaintenanceURL, rmsFN);
+                                            Logger.Log("Remote maintenance software downloaded.");
+                                        }
+                                        catch
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot download Remote maintenance software! Error: {p.ExitCode}");
+                                            Logger.Log("Cannot download Remote maintenance software!");
+                                        }
                                     }
 
-                                    // ----------------------------------------------------------------------------
-                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remote maintenance software ...");
-                                    writer.Flush();
-                                    try
+                                    if (Configuration.EnableNET35)
                                     {
-                                        WebClient rms = new();
-                                        string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
-                                        string rmsFN = Path.Combine(publicDesktop, "Fernwartung Wolkenhof.exe");
-                                        rms.DownloadFile(RemoteMaintenance, rmsFN);
-                                        Logger.Log("Remote maintenance software downloaded.");
-                                    }
-                                    catch
-                                    {
-                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot download Remote maintenance software! Error: {p.ExitCode}");
-                                        Logger.Log("Cannot download Remote maintenance software!");
-                                    }
-
-                                    // ----------------------------------------------------------------------------
-                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
-                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> .NET Framework 3.5 ...");
-                                    writer.Flush();
-                                    p.StartInfo.Arguments = $"/c \"{DotNet}\"";
-                                    p.Start();
-                                    p.WaitForExit();
-
-                                    if (p.ExitCode != 0)
-                                    {
-                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] .NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
+                                        statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
+                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> .NET Framework 3.5 ...");
                                         writer.Flush();
-                                        Logger.Log($".NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
+                                        p.StartInfo.Arguments = $"/c \"dism /Online /Enable-Feature /All /FeatureName:NetFx3 /NoRestart\"";
+                                        p.Start();
+                                        p.WaitForExit();
+
+                                        if (p.ExitCode != 0)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] .NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
+                                            writer.Flush();
+                                            Logger.Log($".NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
+                                        }
                                     }
 
-                                    // ----------------------------------------------------------------------------
-                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
-                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> SMB 1 Protocol ...");
-                                    writer.Flush();
-                                    p.StartInfo.Arguments = $"/c \"{SMB}\"";
-                                    p.Start();
-                                    p.WaitForExit();
-
-                                    if (p.ExitCode != 0)
+                                    if (Configuration.EnableSMB1)
                                     {
-                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
+                                        statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
+                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> SMB 1 Protocol ...");
                                         writer.Flush();
-                                        Logger.Log($"SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
+                                        p.StartInfo.Arguments = $"/c \"dism /Online /Enable-Feature /All /FeatureName:SMB1Protocol /NoRestart\"";
+                                        p.Start();
+                                        p.WaitForExit();
+
+                                        if (p.ExitCode != 0)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
+                                            writer.Flush();
+                                            Logger.Log($"SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
+                                        }
                                     }
+
                                 }
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Applications installed!");
                                 writer.Flush();
@@ -699,184 +929,193 @@ namespace AutoInit
                                 Logger.Log("User requested to configure Windows.");
 
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Configure Windows Installation ...");
-                                
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Green, "[i] Disable Telemetry ...");
-                                writer.Flush();
-                                Logger.Log("Disable Telemetry ...");
-
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement (CEIP/SQM) ...");
-                                writer.Flush();
-                                Logger.Log("Customer Experience Improvement (CEIP/SQM) ...");
-                                
-                                if (!ConfigureWindows.DisableCEI())
+                                #region Telemetry
+                                if (Configuration.DisableTelemetry)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] CEI cannot be disabled.");
+                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Disable Telemetry ...");
                                     writer.Flush();
-                                    Logger.Log("CEI cannot be disabled.");
-                                }
+                                    Logger.Log("Disable Telemetry ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    // ------------------------------------------------------------------------------------------------------------
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Application Impact Telemetry (AIT) ...");
-                                writer.Flush();
-                                Logger.Log("Application Impact Telemetry (AIT) ...");
-
-                                if (!ConfigureWindows.DisableAIT())
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] AIT cannot be disabled.");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement (CEIP/SQM) ...");
                                     writer.Flush();
-                                    Logger.Log("AIT cannot be disabled.");
-                                }
+                                    Logger.Log("Customer Experience Improvement (CEIP/SQM) ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    if (!ConfigureWindows.DisableCEI())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] CEI cannot be disabled.");
+                                        writer.Flush();
+                                        Logger.Log("CEI cannot be disabled.");
+                                    }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement Program ...");
-                                writer.Flush();
-                                Logger.Log("Customer Experience Improvement Program ...");
-                                
-                                if (!ConfigureWindows.DisableCEIP())
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled.");
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Application Impact Telemetry (AIT) ...");
                                     writer.Flush();
-                                    Logger.Log("CEIP cannot be disabled.");
-                                }
+                                    Logger.Log("Application Impact Telemetry (AIT) ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    if (!ConfigureWindows.DisableAIT())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] AIT cannot be disabled.");
+                                        writer.Flush();
+                                        Logger.Log("AIT cannot be disabled.");
+                                    }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Telemetry in Data Collection Policy) ...");
-                                writer.Flush();
-                                Logger.Log("Telemetry in Data Collection Policy) ...");
-                                
-                                if (!ConfigureWindows.DisableDCP())
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] DCP cannot be disabled.");
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Customer Experience Improvement Program ...");
                                     writer.Flush();
-                                    Logger.Log("DCP cannot be disabled.");
-                                }
+                                    Logger.Log("Customer Experience Improvement Program ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    if (!ConfigureWindows.DisableCEIP())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled.");
+                                        writer.Flush();
+                                        Logger.Log("CEIP cannot be disabled.");
+                                    }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> License Telemetry ...");
-                                writer.Flush();
-                                Logger.Log("License Telemetry ...");
-                                
-                                if (!ConfigureWindows.DisableLicenseTel())
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] TLT cannot be disabled. Error while writing into Registry.");
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Telemetry in Data Collection Policy) ...");
                                     writer.Flush();
-                                    Logger.Log("TLT cannot be disabled. Error while writing into Registry.");
-                                }
+                                    Logger.Log("Telemetry in Data Collection Policy) ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    if (!ConfigureWindows.DisableDCP())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] DCP cannot be disabled.");
+                                        writer.Flush();
+                                        Logger.Log("DCP cannot be disabled.");
+                                    }
 
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Devicesensus Telemetry Task...");
-                                writer.Flush();
-                                Logger.Log("Devicesensus Telemetry Task ...");
-                                
-                                if (!ConfigureWindows.DisableDeviceSensus())
-                                {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled. Error while writing into Registry.");
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> License Telemetry ...");
+                                    writer.Flush();
+                                    Logger.Log("License Telemetry ...");
+
+                                    if (!ConfigureWindows.DisableLicenseTel())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] TLT cannot be disabled. Error while writing into Registry.");
+                                        writer.Flush();
+                                        Logger.Log("TLT cannot be disabled. Error while writing into Registry.");
+                                    }
+
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Devicesensus Telemetry Task...");
                                     writer.Flush();
                                     Logger.Log("Devicesensus Telemetry Task ...");
+
+                                    if (!ConfigureWindows.DisableDeviceSensus())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] CEIP cannot be disabled. Error while writing into Registry.");
+                                        writer.Flush();
+                                        Logger.Log("Devicesensus Telemetry Task ...");
+                                    }
                                 }
+                                #endregion
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Green, "[i] Checking system ...");
-                                writer.Flush();
-                                Logger.Log("Checking system ...");
-                                
-
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Check activation state ...");
-                                writer.Flush();
-                                Logger.Log("Check activation state ...");
-
-                                if (!ConfigureWindows.IsWindowsActivated())
+                                #region Windows Activation
+                                if (Configuration.CheckActivation)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Windows is not activated.");
+                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Checking system ...");
                                     writer.Flush();
-                                    Logger.Log("Windows is not activated.");
-                                }
+                                    Logger.Log("Checking system ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Check activation state ...");
+                                    writer.Flush();
+                                    Logger.Log("Check activation state ...");
+
+                                    if (!ConfigureWindows.IsWindowsActivated())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Windows is not activated.");
+                                        writer.Flush();
+                                        Logger.Log("Windows is not activated.");
+                                    }
+                                }
+                                #endregion
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Tweaking Windows ...");
                                 writer.Flush();
                                 Logger.Log("Tweaking Windows ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable auto reboot after BSOD ...");
-                                writer.Flush();
-                                Logger.Log("Disable auto reboot after BSOD ...");
-                                
-                                if (!ConfigureWindows.DisableAutoRebootOnBSOD())
+                                #region Disable auto reboot after BSOD
+                                if (Configuration.DisableAutoRebootAfterBSOD)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Auto Reboot cannot be disabled.");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable auto reboot after BSOD ...");
                                     writer.Flush();
-                                    Logger.Log("Auto Reboot cannot be disabled.");
+                                    Logger.Log("Disable auto reboot after BSOD ...");
+
+                                    if (!ConfigureWindows.DisableAutoRebootOnBSOD())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Auto Reboot cannot be disabled.");
+                                        writer.Flush();
+                                        Logger.Log("Auto Reboot cannot be disabled.");
+                                    }
                                 }
+                                #endregion
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set max. memory dump to small ...");
+                                #region Maximum memory dump size at Kernel panic
+                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set max. memory dump ...");
                                 writer.Flush();
                                 Logger.Log("Set max. memory dump to small ...");
                                 
                                 if (!ConfigureWindows.SetMaxMemDump())
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max. memory dump to small.");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max. memory dump.");
                                     writer.Flush();
-                                    Logger.Log("Cannot set max. memory dump to small.");
+                                    Logger.Log("Cannot set max. memory dump.");
                                 }
+                                #endregion
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable System protection (max. Usage: 20%) ...");
+                                #region System proection
+                                statusCon.WriteLine(ConsoleColor.Yellow, $"    -> Enable System protection (max. Usage: {Configuration.SystemProtection}) ...");
                                 writer.Flush();
-                                Logger.Log("Enable System protection (max. Usage: 20%) ...");
+                                Logger.Log($"Enable System protection (max. Usage: {Configuration.SystemProtection}) ...");
                                 
                                 if (!ConfigureWindows.ShadowStorage())
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max Usage of System protection to 20%.");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max Usage of System protection to {Configuration.SystemProtection}.");
                                     writer.Flush();
-                                    Logger.Log("Cannot set max Usage of System protection to 20%.");
+                                    Logger.Log($"Cannot set max Usage of System protection to {Configuration.SystemProtection}.");
                                 }
+                                #endregion
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set power plan to High Performance ...");
-                                writer.Flush();
-                                Logger.Log("Set power plan to High Performance ...");
-                                
-                                if (!ConfigureWindows.SetMaxPerformance())
+                                #region Performance plan
+                                if (Configuration.SetMaxPerformance)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set power plan to High Performance");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set power plan to High Performance ...");
                                     writer.Flush();
-                                    Logger.Log("Cannot set power plan to High Performance");
+                                    Logger.Log("Set power plan to High Performance ...");
+
+                                    if (!ConfigureWindows.SetMaxPerformance())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set power plan to High Performance");
+                                        writer.Flush();
+                                        Logger.Log("Cannot set power plan to High Performance");
+                                    }
                                 }
+                                #endregion
 
-                                // ------------------------------------------------------------------------------------------------------------
-
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");
-                                writer.Flush();
-                                Logger.Log("Disable Fast Boot ...");
-                                
-                                if (!ConfigureWindows.DisableFastBoot())
+                                #region Fast Boot
+                                if (Configuration.DisableFastBoot)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot disable Fast Boot.");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");
                                     writer.Flush();
-                                    Logger.Log("Cannot disable Fast Boot.");
-                                }
+                                    Logger.Log("Disable Fast Boot ...");
 
-                                // ------------------------------------------------------------------------------------------------------------
+                                    if (!ConfigureWindows.DisableFastBoot())
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot disable Fast Boot.");
+                                        writer.Flush();
+                                        Logger.Log("Cannot disable Fast Boot.");
+                                    }
+                                }
+                                #endregion
 
                                 writer.Flush();
                             }
@@ -893,7 +1132,7 @@ namespace AutoInit
                     var info = infoCon.SplitLeft("Information");
                     var matrix = infoCon.SplitRight("Skull");
 
-                    info.WriteLine($"\nAdministrator Password:\n{AdminPW}\n\n\n\nPress up and down to select.\nPress ESC to exit.");
+                    info.WriteLine($"\nAdministrator Password:\n{Configuration.AdminPassword}\n\nDefault Username:\n{Configuration.DefaultUsername}\n\nPress up and down to select.\nPress ESC to exit.");
                     matrix.ForegroundColor = ConsoleColor.Green;
                     matrix.WriteLine(@"");
                     matrix.WriteLine(@"     |             /  |  ");
