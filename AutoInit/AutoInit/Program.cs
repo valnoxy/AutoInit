@@ -65,8 +65,23 @@ namespace AutoInit
                 // Verify the existance of the config file
                 if (!File.Exists(Configuration._ConfigurationFile))
                 {
-                    Console.WriteLine("ERROR: No configuation file found. (File missing: config.ini)");
                     Logger.Log("ERROR: No configuation file found. (File missing: config.ini)");
+                    Console.WriteLine("ERROR: No configuation file found. (File missing: config.ini)");
+                    Console.Write("       Do you want to create a new one? (Y/N): ");
+                    string answer = Console.ReadLine();
+                    if (answer.ToLower() == "y")
+                    {
+                        Console.WriteLine("[i] Creating new configuration file...");
+                        CreateNewConfig();
+                        Console.WriteLine("[i] New configuration file created.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Exiting...");
+                        return;
+                    }
+
+                    
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
@@ -115,7 +130,19 @@ namespace AutoInit
 
                         if (args[0] == "--new-config")
                         {
-                            string config = @"
+                            CreateNewConfig();
+                            Environment.Exit(0);
+                        }
+                    }
+                }
+
+                Intro.StartIntro();
+                MainMenu();
+            }
+
+            private static void CreateNewConfig()
+            {
+                string config = @"
                                 [AutoInit]
                                 AdminPassword = 
 
@@ -165,22 +192,15 @@ namespace AutoInit
                                 DisableFastBoot = true
 
                             ";
-                            try
-                            {
-                                File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini"), config);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine($"[!] Failed to create new config: {e.Message}");
-                                Environment.Exit(1);
-                            }
-                            Environment.Exit(0);
-                        }
-                    }
+                try
+                {
+                    File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini"), config);
                 }
-
-                Intro.StartIntro();
-                MainMenu();
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[!] Failed to create new config: {e.Message}");
+                    Environment.Exit(1);
+                }
             }
 
             private static void InitConfiguration()
