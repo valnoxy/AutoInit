@@ -42,13 +42,54 @@ Clone this source and restore the NUGET Packages.
 **Filename**: config.ini
 ```
 [AutoInit]
-AdminPW=null
-RemoteMaintenance=<LinkToExe>
-PackageID_Firefox=Mozilla.Firefox
-PackageID_AcrobatReader=Adobe.Acrobat.Reader.64-bit
-DotNet=dism /Online /Enable-Feature /All /FeatureName:NetFx3 /NoRestart
-SMB=dism /Online /Enable-Feature /All /FeatureName:SMB1Protocol /NoRestart
+AdminPassword = 
+
+; Note that this user will be deleted (if not set otherwise) after the Administration switching phase.
+DefaultUsername = User
+RemoveDefaultUser = true
+
+BackgroundMusic = true
+
+[Applications]
+PackageID_Firefox = Mozilla.Firefox
+PackageID_AcrobatReader = Adobe.Acrobat.Reader.64-bit
+InstallFirefox = true
+InstallAcrobatReader = true
+
+EnableSMB1 = true
+EnableNET35 = true
+
+RemoteMaintenance = true
+RemoteMaintenanceURL = https://example.com
+RemoteMaintenanceFileName = Remote Maintenance.exe
+
+; Install other apps by inserting the Package ID of the application.
+; You can find the Package ID by typing 'winget search <Name>' or by searching on https://winget.run/
+; Use ',' for more than one application
+OtherApps =  
+
+[Settings]
+DisableTelemetry = true
+CheckActivation = true
+
+; System Protection
+; Set to 0% to disable system protection
+SystemProtection = 20%
+DisableAutoRebootAfterBSOD = true
+
+; Options:
+;   None = None
+;   Complete = Complete memory dump
+;   Kernel = Kernel memory dump
+;   Small = Small memory dump (64 KB)
+;   Auto = Automatic memory dump
+SPMaxMemoryDump = Small
+
+; Power Settings
+SetMaxPerformance = true
+DisableFastBoot = true
 ```
+You can also use ```AutoInit.exe --new-config``` for creating a new empty configuration.
 
 ## 📖 Credits
  - **goblinfactory**: Simple console library - [Konsole](https://github.com/goblinfactory/konsole)
