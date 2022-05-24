@@ -21,7 +21,7 @@ jobs:
       run: dotnet publish -c Release -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:IncludeNativeLibrariesForSelfExtract=true -r win-x64 AutoInit\AutoInit.sln
     - name: Copy assets
       run: mkdir publish\Music && copy AutoInit\AutoInit\Music\*.* publish\Music\ && del publish\version.txt
-    - name: Zip Release
+    - name: Create Zip file
       # You may pin to the exact commit or the version.
       # uses: TheDoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
       uses: TheDoctor0/zip-release@0.6.2
@@ -36,4 +36,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AutoInit
-        path: publish\AutoInit.zip
+        path: AutoInit.zip
