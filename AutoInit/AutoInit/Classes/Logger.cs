@@ -30,6 +30,7 @@ namespace AutoInit
             {
                 string introMsg =
 @$"AutoInit started at {currentDate} {currentTimeWS} 
+Version: {Program.AutoInit.gitVersion}
 Log file: {logFile}
 ===========================================================
 

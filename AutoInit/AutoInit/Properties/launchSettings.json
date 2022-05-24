@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AutoInit": {
+      "commandName": "Project",
+      "commandLineArgs": "--update \"D:\\AutoInit\""
+    }
+  }
+}

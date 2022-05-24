@@ -1,8 +1,10 @@
 ﻿using Konsole;
 using NAudio.Wave;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AutoInit
 {
-    internal class Program
+    public class Program
     {
         public static class AutoInit
         {
@@ -59,10 +61,45 @@ namespace AutoInit
             static readonly string MusicDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Music");
 
             // Git Version
-            static string gitVersion = String.Empty;
+            public static string gitVersion = String.Empty;
+
+            // Args switches
+            static bool noIntro = false;
 
             public static void Main(string[] args)
             {
+                // Check args
+                if (args != null || args.Length != 0)
+                {
+                    if (args.Length == 1 || args.Length == 2)
+                    {
+                        string arg = args[0];
+                        if (args[0] == "--no-intro")
+                        {
+                            noIntro = true;
+                        }
+
+                        if (args[0] == "--new-config")
+                        {
+                            CreateNewConfig();
+                            Environment.Exit(0);
+                        }
+
+                        if (args[0] == "--update")
+                        {
+                            if (args.Length == 2)
+                            {
+                                string updatePath = args[1];
+                                Console.WriteLine("[i] Updating AutoInit...");
+                                Update(updatePath);
+                                Console.WriteLine("[i] AutoInit updated.");
+                                Environment.Exit(0);
+                            }
+                            Environment.Exit(1);
+                        }
+                    }
+                }
+                
                 // Inititalize log file
                 Logger.StartLogging();
 
@@ -71,9 +108,12 @@ namespace AutoInit
                         .GetManifestResourceStream("AutoInit." + "version.txt"))
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    gitVersion = reader.ReadToEnd();
+                    gitVersion = reader.ReadLine();
                 }
                 Console.Title = "AutoInit [Build: " + gitVersion + "]";
+
+                // Check for updates
+                CheckForUpdates();
 
                 // Verify the existance of the config file
                 if (!File.Exists(Configuration._ConfigurationFile))
@@ -128,83 +168,160 @@ namespace AutoInit
                     });
                 }
 
+                if (!noIntro)
+                    Intro.StartIntro();
+                MainMenu();
+            }
 
-                // Check args
-                if (args != null || args.Length != 0)
+            private static void Update(string updatePath)
+            {
+                // Copy the current AutoInit.exe to the update folder
+
+                // Get current AutoInit.exe path
+                string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+
+                Console.WriteLine("[i] Updating now ...");
+                try
                 {
-                    if (args.Length == 1)
-                    {
-                        string arg = args[0];
-                        if (args[0] == "--no-intro")
-                        {
-                            MainMenu();
-                            Environment.Exit(0);
-                        }
+                    Copy(currentPath, updatePath);
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("[!] Update failed! " + ex.Message);
+                    Thread.Sleep(3000);
+                    Console.ResetColor();
+                    Environment.Exit(1);
+                }
+            }
 
-                        if (args[0] == "--new-config")
-                        {
-                            CreateNewConfig();
-                            Environment.Exit(0);
-                        }
-                    }
+            private static void CheckForUpdates()
+            {
+                string commits = String.Empty;
+
+                try
+                {
+                    WebClient wc = new();
+                    wc.Headers.Add("user-agent", "AutoInit/1.0 valnoxy.dev");
+                    commits = wc.DownloadString("https://api.github.com/repos/valnoxy/AutoInit/commits");
+                }
+                catch
+                {
+                    Console.WriteLine("[i] Cannot check for updates... skipping...");
+                    Logger.Log("Cannot check for updates! Failed to connect to GitHub API (commits).");
                 }
 
-                Intro.StartIntro();
-                MainMenu();
+                try
+                {
+                    dynamic JsonCommitData = JsonConvert.DeserializeObject(commits);
+                    string latestCommit = JsonCommitData[0].sha;
+                    string shortLatestCommit = latestCommit.Substring(0, 7);
+                    
+                    if (shortLatestCommit != gitVersion)
+                    {
+                        // Update available
+                        Logger.Log("New version available! (Current: " + gitVersion + " | Latest: " + shortLatestCommit + ")");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("[i] Update available! (Current: " + gitVersion + " | Latest: " + shortLatestCommit + ")");
+                        Console.Write("[i] Do you want to update? (Y/N): ");
+                        string answer = Console.ReadLine();
+                        if (answer.ToLower() == "y")
+                        {
+                            Console.WriteLine("[i] Downloading new version ...");
+                            Logger.Log("Downloading new version...");
+
+                            // Download new version (thanks to nightly.link)
+                            WebClient wc = new();
+                            wc.Headers.Add("user-agent", "AutoInit/1.0 valnoxy.dev");
+                            string downloadUrl = "https://nightly.link/valnoxy/AutoInit/workflows/dotnet/main/AutoInit.zip";
+                            string updatePath = Path.Combine(Path.GetTempPath(), "AutoInit");
+                            if (!Directory.Exists(updatePath))
+                            {
+                                Directory.CreateDirectory(updatePath);
+                            }
+                            string updateFile = Path.Combine(updatePath, "AutoInit.zip");
+                            wc.DownloadFile(downloadUrl, updateFile);
+
+                            // Extract Zip file
+                            ZipFile.ExtractToDirectory(updateFile, updatePath);
+
+                            // Delete Zip file
+                            File.Delete(updateFile);
+
+                            // Start update process
+                            string appDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+                            ProcessStartInfo startInfo = new ProcessStartInfo();
+                            startInfo.WorkingDirectory = updatePath;
+                            startInfo.FileName = "AutoInit.exe";
+                            startInfo.Arguments = "--update " + appDir;
+                            Process.Start(startInfo);
+
+                            // End Process (this)
+                            Environment.Exit(0);
+                        }
+                        Console.ResetColor();
+                        Console.Clear();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("[i] Cannot check for updates... skipping...\n" + ex.Message);
+                    Logger.Log("Failed to deserialize commits data.");
+                }
             }
 
             private static void CreateNewConfig()
             {
                 string config = @"
-                                [AutoInit]
-                                AdminPassword = 
+[AutoInit]
+AdminPassword = 
 
-                                ; Note that this user will be deleted (if not set otherwise) after the Administration switching phase.
-                                DefaultUsername = User
-                                RemoveDefaultUser = true
+; Note that this user will be deleted (if not set otherwise) after the Administration switching phase.
+DefaultUsername = User
+RemoveDefaultUser = true
 
-                                BackgroundMusic = true
+BackgroundMusic = true
 
-                                [Application]
-                                PackageID_Firefox = Mozilla.Firefox
-                                PackageID_AcrobatReader = Adobe.Acrobat.Reader.64-bit
-                                InstallFirefox = true
-                                InstallAcrobatReader = true
+[Application]
+PackageID_Firefox = Mozilla.Firefox
+PackageID_AcrobatReader = Adobe.Acrobat.Reader.64-bit
+InstallFirefox = true
+InstallAcrobatReader = true
 
-                                EnableSMB1 = true
-                                EnableNET35 = true
+EnableSMB1 = true
+EnableNET35 = true
 
-                                RemoteMaintenance = true
-                                RemoteMaintenanceURL = https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe
-                                RemoteMaintenanceFileName = Fernwartung Wolkenhof.exe
+RemoteMaintenance = true
+RemoteMaintenanceURL = https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe
+RemoteMaintenanceFileName = Fernwartung Wolkenhof.exe
 
-                                ; Install other apps by inserting the Package ID of the application.
-                                ; You can find the Package ID by typing 'winget search <Name>' or by searching on https://winget.run/
-                                ; Use ',' for more than one application
-                                OtherApps =  
+; Install other apps by inserting the Package ID of the application.
+; You can find the Package ID by typing 'winget search <Name>' or by searching on https://winget.run/
+; Use ',' for more than one application
+OtherApps =  
 
-                                [Settings]
-                                DisableTelemetry = true
-                                CheckActivation = true
+[Settings]
+DisableTelemetry = true
+CheckActivation = true
 
-                                ; System Protection
-                                ; Set to 0% to disable system protection
-                                SystemProtection = 20%
-                                DisableAutoRebootAfterBSOD = true
+; System Protection
+; Set to 0% to disable system protection
+SystemProtection = 20%
+DisableAutoRebootAfterBSOD = true
 
-                                ; Options:
-                                ;   None = None
-                                ;   Complete = Complete memory dump
-                                ;   Kernel = Kernel memory dump
-                                ;   Small = Small memory dump (64 KB)
-                                ;   Auto = Automatic memory dump
-                                SPMaxMemoryDump = Small
+; Options:
+;   None = None
+;   Complete = Complete memory dump
+;   Kernel = Kernel memory dump
+;   Small = Small memory dump (64 KB)
+;   Auto = Automatic memory dump
+SPMaxMemoryDump = Small
 
-                                ; Power Settings
-                                SetMaxPerformance = true
-                                DisableFastBoot = true
+; Power Settings
+SetMaxPerformance = true
+DisableFastBoot = true";
 
-                            ";
                 try
                 {
                     File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini"), config);
@@ -373,6 +490,17 @@ namespace AutoInit
                 {
                     Thread.Sleep(100);
                 }
+            }
+
+            public static void Copy(string sourceDir, string targetDir)
+            {
+                Directory.CreateDirectory(targetDir);
+
+                foreach (var file in Directory.GetFiles(sourceDir))
+                    File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
+
+                foreach (var directory in Directory.GetDirectories(sourceDir))
+                    Copy(directory, Path.Combine(targetDir, Path.GetFileName(directory)));
             }
 
             public static void MainMenu()
