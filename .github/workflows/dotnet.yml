@@ -33,8 +33,7 @@ jobs:
         # Tool to use for archiving
         type: zip
     - name: Upload artifact
-    - uses: actions/checkout@v2
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: AutoInit
         path: publish\AutoInit.zip
