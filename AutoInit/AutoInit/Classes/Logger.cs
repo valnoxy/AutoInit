@@ -15,7 +15,7 @@ namespace AutoInit
         public static string StartLogging()
         {
             // Initialize logging
-            DateTime today = DateTime.UtcNow;
+            DateTime today = DateTime.Now;
             string currentDate = today.ToString("dd.MM.yyyy");
             string currentTime = today.ToString("HHmm");
             string currentTimeWS = today.ToString("HH:mm");

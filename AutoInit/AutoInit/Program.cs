@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,12 +56,24 @@ namespace AutoInit
             static bool reinstallWindows = false;
 
             // Music directory
-            static string MusicDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Music");
+            static readonly string MusicDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Music");
+
+            // Git Version
+            static string gitVersion = String.Empty;
 
             public static void Main(string[] args)
             {
                 // Inititalize log file
                 Logger.StartLogging();
+
+                // Set Git version
+                using (Stream stream = Assembly.GetExecutingAssembly()
+                        .GetManifestResourceStream("AutoInit." + "version.txt"))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    gitVersion = reader.ReadToEnd();
+                }
+                Console.Title = "AutoInit [Build: " + gitVersion + "]";
 
                 // Verify the existance of the config file
                 if (!File.Exists(Configuration._ConfigurationFile))

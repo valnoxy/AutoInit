@@ -9,13 +9,23 @@
     <Copyright>Copyright (c) 2018 - 2022 valnoxy. All rights reserved.</Copyright>
     <PackageProjectUrl>https://valnoxy.dev</PackageProjectUrl>
     <ApplicationIcon>AutoInit.ico</ApplicationIcon>
-	<Version>1.1.0</Version> 
+	  <Version>1.1.0</Version> 
     <PublishTrimmed>true</PublishTrimmed>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="version.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="AutoInit.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="version.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,26 +51,30 @@
 
   <ItemGroup>
     <None Update="Music\CRUDE - AVG Anti Spyware 7.5propercrk.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Music\CRUDE - XYplorer 5.10.0020kg.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Music\FFF-EfficientPIM.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Music\GEAR - WinRAR 3.xx + Rar consolecrk.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Music\TheSecret.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Music\tPORt - 1Click DVD Copy 4.2.1.5 kg.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Music\Xpose-end.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="git rev-parse --short HEAD &gt; &quot;$(ProjectDir)\version.txt&quot;" />
+  </Target>
 
 </Project>
