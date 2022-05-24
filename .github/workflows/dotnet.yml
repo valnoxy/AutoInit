@@ -1,0 +1,40 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Publish
+      run: dotnet publish -c Release -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:IncludeNativeLibrariesForSelfExtract=true -r win-x64 AutoInit\AutoInit.sln
+    - name: Copy assets
+      run: mkdir publish\Music && copy AutoInit\AutoInit\Music\*.* publish\Music\ && del publish\version.txt
+    - name: Zip Release
+      # You may pin to the exact commit or the version.
+      # uses: TheDoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
+      uses: TheDoctor0/zip-release@0.6.2
+      with:
+        # Filename for archive
+        filename: AutoInit.zip
+        # Base path for archive files
+        path: publish\
+        # Tool to use for archiving
+        type: zip
+    - name: Upload artifact
+    - uses: actions/checkout@v2
+    - uses: actions/upload-artifact@v3
+      with:
+        name: AutoInit
+        path: publish\AutoInit.zip
