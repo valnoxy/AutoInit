@@ -18,6 +18,8 @@
 
 ![-----------------------------------------------------](https://dl.exploitox.de/t440p-oc/rainbow.png)
 
+![Workflow](https://github.com/valnoxy/AutoInit/actions/workflows/dotnet.yml/badge.svg)
+
 ## 🔔 Information
 AutoInit is a little application for initializing a Windows machine without Image modification. 
 
@@ -35,7 +37,7 @@ AutoInit is a little application for initializing a Windows machine without Imag
 
 ## ⚙️ Compiling the source code
 For compiling, you'll need ```Visual Studio 2022``` and ```.NET 6.0```.
-Clone this source and restore the NUGET Packages.
+Clone this source and restore the NuGet Packages.
 
 ## 📜 Configuation
 
