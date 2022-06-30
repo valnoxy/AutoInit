@@ -85,6 +85,81 @@ namespace AutoInit
                             Environment.Exit(0);
                         }
 
+                        if (args[0] == "--deployment")
+                        {
+                            Configuration.RemoveDefaultUser = false;
+                            Configuration.BackgroundMusic = false;
+                            Configuration.EnableNET35 = true;
+                            Configuration.EnableSMB1 = true;
+                            Configuration.RemoteMaintenance = true;
+                            Configuration.RemoteMaintenanceURL = "https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe";
+                            Configuration.RemoteMaintenanceFileName = "Fernwartung Wolkenhof.exe";
+
+                            AppxRemove.RemoveAppx("Microsoft.Appconnector");
+                            AppxRemove.RemoveAppx("Microsoft.549981C3F5F10");
+                            AppxRemove.RemoveAppx("Microsoft.GetHelp");
+                            AppxRemove.RemoveAppx("Microsoft.Getstarted");
+                            AppxRemove.RemoveAppx("Microsoft.Messaging");
+                            AppxRemove.RemoveAppx("Microsoft.MixedReality.Portal");
+                            AppxRemove.RemoveAppx("Microsoft.WindowsFeedbackHub");
+                            AppxRemove.RemoveAppx("Microsoft.WindowsAlarms");
+                            AppxRemove.RemoveAppx("Microsoft.WindowsCamera");
+                            AppxRemove.RemoveAppx("Microsoft.WindowsMaps");
+                            AppxRemove.RemoveAppx("Microsoft.MinecraftUWP");
+                            AppxRemove.RemoveAppx("Microsoft.People");
+                            AppxRemove.RemoveAppx("Microsoft.Print3D");
+                            AppxRemove.RemoveAppx("Microsoft.OneConnect");
+                            AppxRemove.RemoveAppx("Microsoft.MicrosoftSolitaireCollection");
+                            AppxRemove.RemoveAppx("Microsoft.MicrosoftStickyNotes");
+                            AppxRemove.RemoveAppx("Microsoft.GroupMe10");
+                            AppxRemove.RemoveAppx("Microsoft.WindowsSoundRecorder");
+                            AppxRemove.RemoveAppx("Microsoft.3DBuilder");
+                            AppxRemove.RemoveAppx("Microsoft.Microsoft3DViewer");
+                            AppxRemove.RemoveAppx("Microsoft.BingWeather");
+                            AppxRemove.RemoveAppx("Microsoft.BingSports");
+                            AppxRemove.RemoveAppx("Microsoft.BingNews");
+                            AppxRemove.RemoveAppx("Microsoft.BingFinance");
+                            AppxRemove.RemoveAppx("Microsoft.MicrosoftOfficeHub");
+                            AppxRemove.RemoveAppx("Microsoft.Office.OneNote");
+                            AppxRemove.RemoveAppx("Microsoft.Office.Sway");
+                            AppxRemove.RemoveAppx("Microsoft.XboxApp");
+                            AppxRemove.RemoveAppx("Microsoft.Xbox.TCUI");
+                            AppxRemove.RemoveAppx("Microsoft.XboxGamingOverlay");
+                            AppxRemove.RemoveAppx("Microsoft.XboxGameOverlay");
+                            AppxRemove.RemoveAppx("Microsoft.XboxIdentityProvider");
+                            AppxRemove.RemoveAppx("Microsoft.XboxSpeechToTextOverlay");
+                            AppxRemove.RemoveAppx("Microsoft.NetworkSpeedTest");
+                            AppxRemove.RemoveAppx("Microsoft.Todos");
+                            AppxRemove.RemoveAppx("ShazamEntertainmentLtd.Shazam");
+                            AppxRemove.RemoveAppx("king.com.CandyCrushSaga");
+                            AppxRemove.RemoveAppx("king.com.CandyCrushSodaSaga");
+                            AppxRemove.RemoveAppx("Flipboard.Flipboard");
+                            AppxRemove.RemoveAppx("9E2F88E3.Twitter");
+                            AppxRemove.RemoveAppx("ClearChannelRadioDigital.iHeartRadio");
+                            AppxRemove.RemoveAppx("D5EA27B7.Duolingo-LearnLanguagesforFree");
+                            AppxRemove.RemoveAppx("AdobeSystemIncorporated.AdobePhotoshop");
+                            AppxRemove.RemoveAppx("PandoraMediaInc.29680B314EFC2");
+                            AppxRemove.RemoveAppx("46928bounde.EclipseManager");
+                            AppxRemove.RemoveAppx("ActiproSoftwareLLC.562882FEEB491");
+                            AppxRemove.RemoveAppx("SpotifyAB.SpotifyMusic");
+                            AppxRemove.RemoveAppx("Microsoft.WindowsPhone");
+                            AppxRemove.RemoveAppx("Microsoft.Windows.Phone");
+                            AppxRemove.RemoveAppx("Microsoft.CommsPhone");
+                            AppxRemove.RemoveAppx("Microsoft.YourPhone");
+                            AppxRemove.RemoveAppx("Microsoft.RemoteDesktop");
+
+                            try
+                            {
+                                WebClient rms = new();
+                                string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
+                                string rmsFN = Path.Combine(publicDesktop, Configuration.RemoteMaintenanceFileName);
+                                rms.DownloadFile(Configuration.RemoteMaintenanceURL, rmsFN);
+                            }
+                            catch {;}
+
+                            Environment.Exit(0);
+                        }
+
                         if (args[0] == "--update")
                         {
                             if (args.Length == 2)
