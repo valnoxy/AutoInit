@@ -251,7 +251,6 @@ namespace AutoInit
             private static void Update(string updatePath)
             {
                 // Copy the current AutoInit.exe to the update folder
-
                 // Get current AutoInit.exe path
                 string currentPath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -259,6 +258,9 @@ namespace AutoInit
                 try
                 {
                     Copy(currentPath, updatePath);
+                    Console.WriteLine("[i] Updating completed. Starting ...");
+                    Process.Start(Path.Combine(updatePath, "AutoInit.exe"));
+                    Environment.Exit(0);
                 }
                 catch (Exception ex)
                 {
@@ -278,7 +280,7 @@ namespace AutoInit
                 {
                     WebClient wc = new();
                     wc.Headers.Add("user-agent", "AutoInit/1.0 valnoxy.dev");
-                    commits = wc.DownloadString("https://api.github.com/repos/valnoxy/AutoInit/commits");
+                    commits = wc.DownloadString("https://api.github.com/repos/valnoxy/AutoInit/releases");
                 }
                 catch
                 {
@@ -288,16 +290,24 @@ namespace AutoInit
 
                 try
                 {
+                    // New latest version data
                     dynamic JsonCommitData = JsonConvert.DeserializeObject(commits);
-                    string latestCommit = JsonCommitData[0].sha;
-                    string shortLatestCommit = latestCommit.Substring(0, 7);
+                    string latestVersion = JsonCommitData[0].tag_name;
                     
-                    if (shortLatestCommit != gitVersion)
+                    // This version data
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                    System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+                    string thisVersion = fvi.FileVersion;
+
+                    var oldv = new Version(thisVersion);    
+                    var newv = new Version(latestVersion.Substring(1, latestVersion.Length-1));    
+                    
+                    if (oldv < newv)
                     {
                         // Update available
-                        Logger.Log("New version available! (Current: " + gitVersion + " | Latest: " + shortLatestCommit + ")");
+                        Logger.Log($"New version available! (Current: {thisVersion} | Latest: {latestVersion})");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("[i] Update available! (Current: " + gitVersion + " | Latest: " + shortLatestCommit + ")");
+                        Console.WriteLine($"[i] Update available! (Current: {thisVersion} | Latest: {latestVersion})");
                         Console.Write("[i] Do you want to update? (Y/N): ");
                         string answer = Console.ReadLine();
                         if (answer.ToLower() == "y")
@@ -308,7 +318,7 @@ namespace AutoInit
                             // Download new version (thanks to nightly.link)
                             WebClient wc = new();
                             wc.Headers.Add("user-agent", "AutoInit/1.0 valnoxy.dev");
-                            string downloadUrl = "https://nightly.link/valnoxy/AutoInit/workflows/dotnet/main/AutoInit.zip";
+                            string downloadUrl = $"https://github.com/valnoxy/AutoInit/releases/download/{latestVersion}/AutoInit_{latestVersion}.zip";
                             string updatePath = Path.Combine(Path.GetTempPath(), "AutoInit");
                             if (!Directory.Exists(updatePath))
                             {
@@ -572,7 +582,7 @@ DisableFastBoot = true";
                 Directory.CreateDirectory(targetDir);
 
                 foreach (var file in Directory.GetFiles(sourceDir))
-                    File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
+                    File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)), true);
 
                 foreach (var directory in Directory.GetDirectories(sourceDir))
                     Copy(directory, Path.Combine(targetDir, Path.GetFileName(directory)));

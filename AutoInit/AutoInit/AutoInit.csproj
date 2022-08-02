@@ -12,6 +12,8 @@
 	  <Version>1.1.0</Version> 
     <PublishTrimmed>true</PublishTrimmed>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	<AssemblyVersion>1.1.0</AssemblyVersion>
+	<FileVersion>1.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +33,7 @@
   <ItemGroup>
     <PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
     <PackageReference Include="NAudio" Version="2.1.0" />
-    <PackageReference Include="System.Management.Automation" Version="7.2.4" />
+    <PackageReference Include="System.Management.Automation" Version="7.2.5" />
   </ItemGroup>
 
   <ItemGroup>
