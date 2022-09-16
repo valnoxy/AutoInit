@@ -90,7 +90,7 @@ namespace AutoInit
                             Configuration.RemoveDefaultUser = false;
                             Configuration.BackgroundMusic = false;
                             Configuration.EnableNET35 = true;
-                            Configuration.EnableSMB1 = true;
+                            Configuration.EnableSMB1 = false;
                             Configuration.RemoteMaintenance = true;
                             Configuration.RemoteMaintenanceURL = "https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe";
                             Configuration.RemoteMaintenanceFileName = "Fernwartung Wolkenhof.exe";
@@ -1126,11 +1126,17 @@ DisableFastBoot = true";
                                         p.Start();
                                         p.WaitForExit();
 
-                                        if (p.ExitCode != 0)
+                                        if (p.ExitCode != 0 || p.ExitCode != 3010) // 3010 = ERROR_SUCCESS_REBOOT_REQUIRED
                                         {
                                             statusCon.WriteLine(ConsoleColor.Red, $"[!] .NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
                                             writer.Flush();
                                             Logger.Log($".NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
+                                        }
+                                        if (p.ExitCode == 3010)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Yellow, $"[!] .NET Framework 3.5 was installed but a reboot is required!");
+                                            writer.Flush();
+                                            Logger.Log($".NET Framework 3.5 was installed but a reboot is required.");
                                         }
                                     }
 
@@ -1148,6 +1154,12 @@ DisableFastBoot = true";
                                             statusCon.WriteLine(ConsoleColor.Red, $"[!] SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
                                             writer.Flush();
                                             Logger.Log($"SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
+                                        }
+                                        if (p.ExitCode == 3010)
+                                        {
+                                            statusCon.WriteLine(ConsoleColor.Yellow, $"[!] SMB 1 Protocol was installed but a reboot is required!");
+                                            writer.Flush();
+                                            Logger.Log($"SMB 1 Protocol was installed but a reboot is required.");
                                         }
                                     }
 
