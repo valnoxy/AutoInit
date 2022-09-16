@@ -11,4 +11,8 @@
     <PackageReference Include="WPF-UI" Version="2.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
+  </ItemGroup>
+
 </Project>

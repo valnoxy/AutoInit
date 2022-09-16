@@ -41,8 +41,8 @@
         <Grid Row="2" Margin="15,0,15,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:CardAction Icon="PersonSwap24" Content="Switch to Administrator" Margin="0,0,0,10" IsEnabled="false"/>
-                    <ui:CardAction Icon="Recycle32" Content="Remove Bloatware" Margin="0,0,0,10" IsEnabled="false"/>
+                    <ui:CardAction Icon="PersonSwap24" Content="Switch to Administrator" Margin="0,0,0,10" IsEnabled="true" Click="SwitchToAdmin_Click"/>
+                    <ui:CardAction Icon="Recycle32" Content="Remove Bloatware" Margin="0,0,0,10" IsEnabled="false" Click="RemoveBloatware_Click"/>
                     <ui:CardAction Icon="ArrowDownload48" Content="Install Software" Margin="0,0,0,10" IsEnabled="false"/>
                     <ui:CardAction Icon="WindowSettings20" Content="Configure Windows" Margin="0,0,0,10" IsEnabled="false"/>
                     <ui:CardAction Icon="ArrowReset32" Content="Reinstall Windows" Margin="0,0,0,10" IsEnabled="false"/>
@@ -66,8 +66,8 @@
             </Grid>
 
             <StackPanel Grid.Column="0">
-                <Label Content="Sample Progress ..."/>
-                <ProgressBar />
+                <Label x:Name="ActionLabel" Content=""/>
+                <ProgressBar x:Name="ProgBar" />
             </StackPanel>
         </Grid>
         
