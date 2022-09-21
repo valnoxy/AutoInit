@@ -29,8 +29,7 @@ namespace AutoInit
             using (StreamWriter streamWriter = new StreamWriter(logFile))
             {
                 string introMsg =
-@$"AutoInit started at {currentDate} {currentTimeWS} 
-Version: {Program.AutoInit.gitVersion}
+@$"AutoInit started at {currentDate} {currentTimeWS}
 Log file: {logFile}
 ===========================================================
 

@@ -5,7 +5,17 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <PackageId>AutoInit UI</PackageId>
+    <Authors>valnoxy</Authors>
+    <Product>AutoInit</Product>
+    <Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
+    <ApplicationIcon>AutoInit.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="AutoInit.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WPF-UI" Version="2.0.2" />
