@@ -43,7 +43,7 @@
                 <StackPanel>
                     <ui:CardAction x:Name="SwitchActionCard" Icon="PersonSwap24" Content="Switch to Administrator" Margin="0,0,0,10" IsEnabled="true" Click="SwitchToAdmin_Click"/>
                     <ui:CardAction x:Name="RemoveActionCard" Icon="Recycle32" Content="Remove Bloatware" Margin="0,0,0,10" IsEnabled="true" Click="RemoveBloatware_Click"/>
-                    <ui:CardAction x:Name="InstallActionCard" Icon="ArrowDownload48" Content="Install Software" Margin="0,0,0,10" IsEnabled="true" Click="InstallActionCard_OnClick"/>
+                    <ui:CardAction x:Name="InstallActionCard" Icon="ArrowDownload48" Content="Install Software" Margin="0,0,0,10" IsEnabled="true" Click="InstallActionCard_Click"/>
                     <ui:CardAction x:Name="ConfigureActionCard" Icon="WindowSettings20" Content="Configure Windows" Margin="0,0,0,10" IsEnabled="false"/>
                     <ui:CardAction x:Name="ReinstallActionCard" Icon="ArrowReset32" Content="Reinstall Windows" Margin="0,0,0,10" IsEnabled="false"/>
                 </StackPanel>

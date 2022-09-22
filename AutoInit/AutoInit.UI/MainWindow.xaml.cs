@@ -26,7 +26,10 @@ namespace AutoInit.UI
     /// </summary>
     public partial class MainWindow
     {
-        BackgroundWorker backgroundWorker = new BackgroundWorker();
+        private BackgroundWorker bWSwitch = new BackgroundWorker();
+        private BackgroundWorker bWBloatware = new BackgroundWorker();
+        private BackgroundWorker bWSoftware = new BackgroundWorker();
+        private string AdminPassword;
 
         public MainWindow()
         {
@@ -40,39 +43,42 @@ namespace AutoInit.UI
             {
                 SwitchActionCard.IsEnabled = false;
             }
-
-            backgroundWorker.WorkerReportsProgress = true;
-            backgroundWorker.WorkerSupportsCancellation = true;
-            backgroundWorker.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
+            // bWSwitch
+            bWSwitch.WorkerReportsProgress = true;
+            bWSwitch.WorkerSupportsCancellation = true;
+            bWSwitch.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            bWSwitch.DoWork += new DoWorkEventHandler(SwitchToAdmin_DoWork);
+            // bWBloatware
+            bWBloatware.WorkerReportsProgress = true;
+            bWBloatware.WorkerSupportsCancellation = true;
+            bWBloatware.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            bWBloatware.DoWork += new DoWorkEventHandler(RemoveBloatware_DoWork);
+            // bWSoftware
+            bWSoftware.WorkerReportsProgress = true;
+            bWSoftware.WorkerSupportsCancellation = true;
+            bWSoftware.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            bWSoftware.DoWork += new DoWorkEventHandler(InstallSoftware_DoWork);
         }
 
-        public void SwitchToAdmin_Click(object sender, RoutedEventArgs e)
-        {
-            backgroundWorker.DoWork += new DoWorkEventHandler(SwitchToAdmin_DoWork);
-            backgroundWorker.RunWorkerAsync();
-        }
-
-        public void RemoveBloatware_Click(object sender, RoutedEventArgs e)
-        {
-            backgroundWorker.DoWork += new DoWorkEventHandler(RemoveBloatware_DoWork);
-            backgroundWorker.RunWorkerAsync();
-        }
-
-        void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e) =>
-            ProgrBar.Value = e.ProgressPercentage;
+        public void SwitchToAdmin_Click(object sender, RoutedEventArgs e) => bWSwitch.RunWorkerAsync();
+        public void RemoveBloatware_Click(object sender, RoutedEventArgs e) => bWBloatware.RunWorkerAsync();
+        public void InstallActionCard_Click(object sender, RoutedEventArgs e) => bWSoftware.RunWorkerAsync();
+        void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => ProgrBar.Value = e.ProgressPercentage;
 
         void SwitchToAdmin_DoWork(object sender, DoWorkEventArgs e)
         {
+            LockUI();
+
             // Call event handler to update progress bar
-            backgroundWorker.ReportProgress(0);
-            
+            bWSwitch.ReportProgress(0);
+
             Dispatcher.Invoke(new Action(() => {
-                ActionLabel.Content = "Switching to Administrator account ...";
+                ActionLabel.Content = "Change Administrator password ...";
             }), DispatcherPriority.ContextIdle);
 
             Process p = new Process();
             p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.Arguments = "/c \"net user Administrator /active:yes\"";
+            p.StartInfo.Arguments = $"/c \"net user Administrator {AdminPassword}\"";
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.Start();
@@ -80,41 +86,57 @@ namespace AutoInit.UI
 
             if (p.ExitCode != 0)
             {
-                backgroundWorker.ReportProgress(0);
-                
+                bWSwitch.ReportProgress(0);
                 Dispatcher.Invoke(new Action(() => {
-                    ActionLabel.Content = $"Cannot enable Administrator account! Error: {p.ExitCode}";
+                    ActionLabel.Content = $"Cannot change password from Administrator account! Error: {p.ExitCode}";
                 }), DispatcherPriority.ContextIdle);
-                
-                backgroundWorker.CancelAsync();
-                
+                UnlockUI();
+                bWSwitch.CancelAsync();
+
                 return;
             }
 
             // Call event handler to update progress bar
-            backgroundWorker.ReportProgress(33);
+            bWSwitch.ReportProgress(33);
             
             Dispatcher.Invoke(new Action(() => {
-                ActionLabel.Content = "Change Administrator password ...";
+                ActionLabel.Content = "Enable Administrator account ...";
             }), DispatcherPriority.ContextIdle);
-            
-            p.StartInfo.Arguments = $"/c \"net user Administrator {TbPassword.Text}\"";
+
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.Arguments = "/c \"net user Administrator /active:yes\"";
             p.Start();
             p.WaitForExit();
 
             if (p.ExitCode != 0)
             {
-                backgroundWorker.ReportProgress(0);
-                Dispatcher.Invoke(new Action(() => {
-                    ActionLabel.Content = $"Cannot change password from Administrator account! Error: {p.ExitCode}";
-                }), DispatcherPriority.ContextIdle);
-                backgroundWorker.CancelAsync();
+                bWSwitch.ReportProgress(0);
 
+                if (p.ExitCode == 2)
+                {
+                    Dispatcher.Invoke(
+                        new Action(() =>
+                        {
+                            ActionLabel.Content =
+                                $"Cannot enable Administrator account! The password does not meet the password policy requirements.";
+                        }), DispatcherPriority.ContextIdle);
+                }
+                else
+                {
+                    Dispatcher.Invoke(
+                        new Action(() =>
+                        {
+                            ActionLabel.Content = $"Cannot enable Administrator account! Error: {p.ExitCode}";
+                        }), DispatcherPriority.ContextIdle);
+                }
+                UnlockUI();
+                bWSwitch.CancelAsync();
+                
                 return;
             }
 
             // Call event handler to update progress bar
-            backgroundWorker.ReportProgress(66);
+            bWSwitch.ReportProgress(66);
             
             Dispatcher.Invoke(new Action(() => {
                 ActionLabel.Content = "Remove account 'User' ...";
@@ -126,31 +148,31 @@ namespace AutoInit.UI
 
             if (p.ExitCode != 0)
             {
-                backgroundWorker.ReportProgress(0);
+                bWSwitch.ReportProgress(0);
                 
                 Dispatcher.Invoke(new Action(() => {
                     ActionLabel.Content = $"Cannot delete account 'User'! Error: {p.ExitCode}";
                 }), DispatcherPriority.ContextIdle);
-                
-                backgroundWorker.CancelAsync();
+                UnlockUI();
+                bWSwitch.CancelAsync();
 
                 return;
             }
 
             // Call event handler to update progress bar
-            backgroundWorker.ReportProgress(100);
+            bWSwitch.ReportProgress(100);
             
             Dispatcher.Invoke(new Action(() => {
                 ActionLabel.Content = "Successfully switched to Administrator. Please log out now.";
             }), DispatcherPriority.ContextIdle);
-            
-            backgroundWorker.DoWork -= SwitchToAdmin_DoWork;
+            UnlockUI();
         }
 
         void RemoveBloatware_DoWork(object sender, DoWorkEventArgs e)
         {
+            LockUI();
             int statuscode;
-            backgroundWorker.ReportProgress(0);
+            bWBloatware.ReportProgress(0);
             Dispatcher.Invoke(new Action(() => {
                 ActionLabel.Content = "Removing bloatware ...";
             }), DispatcherPriority.ContextIdle);
@@ -227,26 +249,25 @@ namespace AutoInit.UI
                         ActionLabel.Content = $"Cannot remove {app.Name}! Error: {statuscode}";
                         ProgrBar.Value = 0;
                     }), DispatcherPriority.ContextIdle);
-                    return;
                 }
 
                 double progressValue1 = (double)progress / (double)AppxRemove.apps.Count;
                 double progressValue2 = progressValue1 * 100;
                 int progressValue = Convert.ToInt32(progressValue2);
 
-                backgroundWorker.ReportProgress(progressValue);
+                bWBloatware.ReportProgress(progressValue);
             }
 
-            backgroundWorker.ReportProgress(100);
+            bWBloatware.ReportProgress(100);
             Dispatcher.Invoke(new Action(() => {
                 ActionLabel.Content = "Bloatware removed!";
             }), DispatcherPriority.ContextIdle);
-            backgroundWorker.DoWork -= RemoveBloatware_DoWork;
+            UnlockUI();
         }
 
-        private void InstallActionCard_OnClick(object sender, RoutedEventArgs e)
+        private void InstallSoftware_DoWork(object sender, DoWorkEventArgs e)
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i <= 100; i++)
             {
                 Dispatcher.Invoke(new Action(() => {
                     ProgrBar.Value = i;
@@ -254,6 +275,37 @@ namespace AutoInit.UI
                 Thread.Sleep(100);
             }
 
+        }
+
+        private void LockUI()
+        {
+            Dispatcher.Invoke(new Action(() => {
+                TbPassword.IsEnabled = false;
+                SwitchActionCard.IsEnabled = false;
+                RemoveActionCard.IsEnabled = false;
+                InstallActionCard.IsEnabled = false;
+                ConfigureActionCard.IsEnabled = false;
+                ReinstallActionCard.IsEnabled = false;
+            }), DispatcherPriority.ContextIdle);
+        }
+
+        private void UnlockUI()
+        {
+            Dispatcher.Invoke(new Action(() => {
+                TbPassword.IsEnabled = true;
+                if (TbPassword.Password.Length > 0)
+                {
+                    SwitchActionCard.IsEnabled = true;
+                }
+                else
+                {
+                    SwitchActionCard.IsEnabled = false;
+                }
+                RemoveActionCard.IsEnabled = true;
+                InstallActionCard.IsEnabled = true;
+                ConfigureActionCard.IsEnabled = true;
+                ReinstallActionCard.IsEnabled = true;
+            }), DispatcherPriority.ContextIdle);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -266,6 +318,7 @@ namespace AutoInit.UI
             if (TbPassword.Password.Length > 0)
             {
                 SwitchActionCard.IsEnabled = true;
+                AdminPassword = TbPassword.Password;
             }
             else
             {
