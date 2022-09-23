@@ -38,6 +38,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Scripts.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

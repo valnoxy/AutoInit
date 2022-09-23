@@ -1,29 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <PackageId>AutoInit UI</PackageId>
-    <Authors>valnoxy</Authors>
-    <Product>AutoInit</Product>
-    <Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
-    <ApplicationIcon>AutoInit.ico</ApplicationIcon>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>AnyCPU;ARM64;x64</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<PackageId>AutoInit UI</PackageId>
+		<Authors>valnoxy</Authors>
+		<Product>AutoInit</Product>
+		<Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
+		<ApplicationIcon>AutoInit.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>AnyCPU;ARM64;x64</Platforms>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="AutoInit.ico" />
-  </ItemGroup>
+	<ItemGroup>
+	  <None Remove="AutoInit.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="WPF-UI" Version="2.0.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="AutoInit.ico" />
+		<Resource Include="AutoInit.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Resource>
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="WPF-UI" Version="2.0.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
+	</ItemGroup>
 
 </Project>

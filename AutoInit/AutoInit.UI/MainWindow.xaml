@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AutoInit.UI"
         mc:Ignorable="d"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        Title="MainWindow" Height="575" Width="800"
+        Title="AutoInit" Height="575" Width="800"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
@@ -74,6 +74,6 @@
         <!--  The title bar contains window navigation elements and some Tray related extras.  -->
         <!--  You can put additional controls in the header, such as a search bar.  -->
         <!--  <ui:TitleBar.Header />  -->
-        <ui:TitleBar Title="AutoInit" Grid.Row="0"/>
+        <ui:TitleBar Title="AutoInit" Icon="pack://application:,,,/AutoInit.ico" Grid.Row="0"/>
     </Grid>
 </ui:UiWindow>

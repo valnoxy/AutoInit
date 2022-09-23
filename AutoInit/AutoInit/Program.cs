@@ -2,6 +2,8 @@
 using NAudio.Wave;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -10,6 +12,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoInit.Core;
+using AutoInit.Core.Actions;
 
 namespace AutoInit
 {
@@ -625,18 +629,14 @@ DisableFastBoot = true";
                         {
                             while (switchToAdmin && !finished)
                             {
+                                int status;
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Switch to Administrator account ...");
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable Administrator account ...");
                                 writer.Flush();
-                                Process p = new Process();
-                                p.StartInfo.FileName = "cmd.exe";
-                                p.StartInfo.Arguments = "/c \"net user Administrator /active:yes\"";
-                                p.StartInfo.UseShellExecute = false;
-                                p.StartInfo.CreateNoWindow = true;
-                                p.Start();
-                                p.WaitForExit();
 
-                                if (p.ExitCode != 0)
+                                status = Core.Actions.SwitchToAdmin.EnableAdmin();
+                                
+                                if (status != 0)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot enable Administrator account! Error: {p.ExitCode}");
                                     writer.Flush();
@@ -647,11 +647,10 @@ DisableFastBoot = true";
 
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Change Administrator password ...");
                                 writer.Flush();
-                                p.StartInfo.Arguments = $"/c \"net user Administrator {Configuration.AdminPassword}\"";
-                                p.Start();
-                                p.WaitForExit();
 
-                                if (p.ExitCode != 0)
+                                status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(Configuration.AdminPassword);
+
+                                if (status != 0)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot change password from Administrator account! Error: {p.ExitCode}");
                                     writer.Flush();
@@ -663,11 +662,10 @@ DisableFastBoot = true";
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remove User account ...");
                                     writer.Flush();
-                                    p.StartInfo.Arguments = $"/c \"net user {Configuration.DefaultUsername} /delete\"";
-                                    p.Start();
-                                    p.WaitForExit();
 
-                                    if (p.ExitCode != 0)
+                                    status = Core.Actions.SwitchToAdmin.RemoveUser(Configuration.DefaultUsername);
+
+                                    if (status != 0)
                                     {
                                         statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot delete account '{Configuration.DefaultUsername}'! Error: {p.ExitCode}");
                                         writer.Flush();
@@ -694,307 +692,72 @@ DisableFastBoot = true";
                                 statuscode = AppxRemove.RemoveAppx("Microsoft.Appconnector");
                                 if (statuscode != 0)
                                     statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Cortana ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.549981C3F5F10");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Get Help ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.GetHelp");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Tips app ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Getstarted");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Messaging ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Messaging");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Mixed Reality Portal ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.MixedReality.Portal");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Feedback Hub ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsFeedbackHub");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Alarms ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsAlarms");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Camera ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsCamera");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Windows Maps ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsMaps");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Minecraft for Windows 10 Edition ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.MinecraftUWP");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing People ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.People");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Print3D...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Print3D");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Mobile Plans ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.OneConnect");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Microsoft Solitaire Collection ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.MicrosoftSolitaireCollection");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Sticky Notes ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.MicrosoftStickyNotes");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing GroupMe ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.GroupMe10");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Voice Recorder ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsSoundRecorder");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing 3D Builder ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.3DBuilder");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing 3D Viewer ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Microsoft3DViewer");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN Weather ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingWeather");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN Sports ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingSports");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN News ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingNews");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing MSN Finance ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.BingFinance");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing My Office ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.MicrosoftOfficeHub");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Office OneNote ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Office.OneNote");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Sway ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Office.Sway");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox App ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxApp");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Live in-game experience ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Xbox.TCUI");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Game Bar ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxGamingOverlay");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Game Bar Plugin ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxGameOverlay");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Identity Provider ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxIdentityProvider");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Xbox Speech to Text Overlay ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.XboxSpeechToTextOverlay");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Network Speedtest ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.NetworkSpeedTest");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing To Do app ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Todos");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Shazam ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("ShazamEntertainmentLtd.Shazam");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Candy Crush ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("king.com.CandyCrushSaga");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                statuscode = AppxRemove.RemoveAppx("king.com.CandyCrushSodaSaga");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Flipboard ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Flipboard.Flipboard");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Twitter ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("9E2F88E3.Twitter");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing iHeartRadio ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("ClearChannelRadioDigital.iHeartRadio");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Duolingo ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("D5EA27B7.Duolingo-LearnLanguagesforFree");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Photoshop Express ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("AdobeSystemIncorporated.AdobePhotoshop");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Pandora ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("PandoraMediaInc.29680B314EFC2");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Eclipse Manager ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("46928bounde.EclipseManager");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Code Writer ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("ActiproSoftwareLLC.562882FEEB491");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Spotify ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("SpotifyAB.SpotifyMusic");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Your Phone Companion ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.WindowsPhone");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Windows.Phone");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Communications - Phone app ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.CommsPhone");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Your Phone ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.YourPhone");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
-                                statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing Remote Desktop app ...");
-                                writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.RemoteDesktop");
-                                if (statuscode != 0)
-                                    statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
-                                // ---------------------------------------------------------------------------
+
+                                // Initialize list of apps to remove
+                                Core.Actions.AppxManagement.apps = new List<Core.Actions.AppxManagement.App>();
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "App Connector", ID = "Microsoft.Appconnector" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Cortana", ID = "Microsoft.549981C3F5F10" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Get Help", ID = "Microsoft.GetHelp" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Tips app", ID = "Microsoft.Getstarted" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Messaging", ID = "Microsoft.Messaging" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Mixed Reality Portal", ID = "Microsoft.MixedReality.Portal" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Feedback Hub", ID = "Microsoft.WindowsFeedbackHub" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Alarms", ID = "Microsoft.WindowsAlarms" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Camera", ID = "Microsoft.WindowsCamera" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Maps", ID = "Microsoft.WindowsMaps" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Minecraft for Windows 10 Edition", ID = "Microsoft.MinecraftUWP" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "People", ID = "Microsoft.People" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Print3D", ID = "Microsoft.Print3D" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Mobile Plans", ID = "Microsoft.OneConnect" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Microsoft Solitaire Collection", ID = "Microsoft.MicrosoftSolitaireCollection" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Sticky Notes", ID = "Microsoft.MicrosoftStickyNotes" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "GroupMe", ID = "Microsoft.GroupMe10" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Voice Recorder", ID = "Microsoft.WindowsSoundRecorder" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "3D Builder", ID = "Microsoft.3DBuilder" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "3D Viewer", ID = "Microsoft.Microsoft3DViewer" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Weather", ID = "Microsoft.BingWeather" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Sports", ID = "Microsoft.BingSports" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN News", ID = "Microsoft.BingNews" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Finance", ID = "Microsoft.BingFinance" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "My Office", ID = "Microsoft.MicrosoftOfficeHub" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Microsoft Office OneNote", ID = "Microsoft.Office.OneNote" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Sway", ID = "Microsoft.Office.Sway" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox App", ID = "Microsoft.XboxApp" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Live in-game experience", ID = "Microsoft.Xbox.TCUI" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Game Bar", ID = "Microsoft.XboxGamingOverlay" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Game Bar Plugin", ID = "Microsoft.XboxGameOverlay" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Identity Provider", ID = "Microsoft.XboxIdentityProvider" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Speech to Text Overlay", ID = "Microsoft.XboxSpeechToTextOverlay" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Network Speedtest", ID = "Microsoft.NetworkSpeedTest" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "To Do app", ID = "Microsoft.Todos" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Shazam", ID = "ShazamEntertainmentLtd.Shazam" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Candy Crush Saga", ID = "king.com.CandyCrushSaga" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Candy Crush Soda Saga", ID = "king.com.CandyCrushSodaSaga" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Flipboard", ID = "Flipboard.Flipboard" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Twitter", ID = "9E2F88E3.Twitter" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "iHeartRadio", ID = "ClearChannelRadioDigital.iHeartRadio" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Duolingo", ID = "D5EA27B7.Duolingo-LearnLanguagesforFree" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Photoshop Express", ID = "AdobeSystemIncorporated.AdobePhotoshop" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Pandora", ID = "PandoraMediaInc.29680B314EFC2" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Eclipse Manager", ID = "46928bounde.EclipseManager" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Code Writer", ID = "ActiproSoftwareLLC.562882FEEB491" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Spotify", ID = "SpotifyAB.SpotifyMusic" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Your Phone Companion #1", ID = "Microsoft.WindowsPhone" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Your Phone Companion #2", ID = "Microsoft.Windows.Phon" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Communications - Phone app", ID = "Microsoft.CommsPhone" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Your Phone", ID = "Microsoft.YourPhone" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Remote Desktop app", ID = "Microsoft.RemoteDesktop" });
+
+                                int progress = 0;
+                                foreach (var app in Core.Actions.AppxManagement.apps)
+                                {
+                                    progress++;
+                                    statusCon.WriteLine(ConsoleColor.Yellow, $"   -> Removing {app.Name} ...");
+
+                                    statuscode = Core.Actions.AppxManagement.RemoveAppx(app.ID);
+
+                                    if (statuscode != 0) statusCon.WriteLine(ConsoleColor.Red, $"   -> Cannot remove {app.Name}! Error: {statuscode}");
+                                }
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Bloatware removed!");
                                 removeBloadware = false;
@@ -1009,14 +772,11 @@ DisableFastBoot = true";
                                 writer.Flush();
                                 Logger.Log("User requested to install applications.");
 
-                                // Check if winget is installed on the device
-                                Process p = new Process();
-                                p.StartInfo.FileName = "cmd.exe";
-                                p.StartInfo.Arguments = "/c winget";
-                                p.Start();
-                                p.WaitForExit();
+                                int status;
 
-                                if (p.ExitCode != 0)
+                                // Check if winget is installed on the device
+                                bool isWingetInstalled = Core.Actions.AppxManagement.IsWingetInstalled();
+                                if (!isWingetInstalled)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, "[!] Error: Winget not found. Please update App Installer!");
                                     writer.Flush();
@@ -1025,145 +785,136 @@ DisableFastBoot = true";
                                     installApplications = false;
                                     break;
                                 }
-                                else
+
+                                // Begin installation
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Applications with WinGet ...");
+                                writer.Flush();
+                                Logger.Log("Installing Applications with WinGet ...");
+
+                                if (Configuration.InstallFirefox)
                                 {
-                                    // Begin installation
-                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Applications with WinGet ...");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Firefox ...");
                                     writer.Flush();
-                                    Logger.Log("Installing Applications with WinGet ...");
+                                    Logger.Log("Installing Firefox ...");
 
-                                    // Prompt for accepting EULA
-                                    p.StartInfo.Arguments = "/c winget list";
-                                    p.Start();
-                                    p.WaitForExit();
-                                    p.StartInfo.UseShellExecute = false;
-                                    p.StartInfo.CreateNoWindow = true;
+                                    status = Core.Actions.AppxManagement.InstallApp(Configuration.PackageID_Firefox);
 
-
-                                    if (Configuration.InstallFirefox)
+                                    if (status != 0)
                                     {
-                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> Firefox ...");
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {status}");
                                         writer.Flush();
-                                        Logger.Log("Installing Firefox ...");
+                                        Logger.Log($"Firefox cannot be installed. Error: {status}");
+                                    }
+                                }
 
-                                        p.StartInfo.Arguments = $"/c winget install --id {Configuration.PackageID_Firefox}";
-                                        p.Start();
-                                        p.WaitForExit();
+                                if (Configuration.InstallAcrobatReader)
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Adobe Acrobat Reader DC ...");
+                                    writer.Flush();
+                                    Logger.Log("Installing Adobe Acrobat Reader DC ...");
 
-                                        if (p.ExitCode != 0)
+                                    status = Core.Actions.AppxManagement.InstallApp(Configuration.PackageID_AcrobatReader);
+
+                                    if (status != 0)
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Adobe Acrobat Reader DC cannot be installed. Error: {status}");
+                                        writer.Flush();
+                                        Logger.Log($"Adobe Acrobat Reader DC cannot be installed. Error: {status}");
+                                    }
+                                }
+
+                                if (!String.IsNullOrEmpty(Configuration.OtherApps))
+                                {
+                                    string[] otherapps = Configuration.OtherApps.Split(',');
+                                    foreach (string app in otherapps)
+                                    {
+                                        statusCon.WriteLine(ConsoleColor.Yellow,$"    -> Application '{app}'");
+                                        writer.Flush();
+                                        Logger.Log($"Installing Application with PackageID '{app}' ...");
+
+                                        status = Core.Actions.AppxManagement.InstallApp(app);
+
+                                        if (status != 0)
                                         {
-                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Firefox cannot be installed. Error: {p.ExitCode}");
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Application '{app}' cannot be installed. Error: {status}");
                                             writer.Flush();
-                                            Logger.Log($"Firefox cannot be installed. Error: {p.ExitCode}");
+                                            Logger.Log($"Application '{app}' cannot be installed. Error: {status}");
                                         }
                                     }
+                                }
 
-                                    if (Configuration.InstallAcrobatReader)
-                                    {
-                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> Adobe Acrobat Reader DC ...");
-                                        writer.Flush();
-                                        Logger.Log("Installing Adobe Acrobat Reader DC ...");
+                                if (Configuration.RemoteMaintenance)
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remote maintenance software ...");
+                                    writer.Flush();
+
+                                    string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
+                                    string rmsFn = Path.Combine(publicDesktop, Configuration.RemoteMaintenanceFileName);
+                                    Logger.Log("Remote maintenance software downloaded.");
                                     
-                                        p.StartInfo.Arguments = $"/c winget install --id {Configuration.PackageID_AcrobatReader}";
-                                        p.Start();
-                                        p.WaitForExit();
+                                    status = Core.Actions.AppxManagement.InstallRM(Configuration.RemoteMaintenanceURL, rmsFn);
 
-                                        if (p.ExitCode != 0)
-                                        {
-                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Adobe Acrobat Reader DC cannot be installed. Error: {p.ExitCode}");
-                                            writer.Flush();
-                                            Logger.Log($"Adobe Acrobat Reader DC cannot be installed. Error: {p.ExitCode}");
-                                        }
-                                    }
-
-                                    if (!String.IsNullOrEmpty(Configuration.OtherApps))
+                                    if (status != 0) 
                                     {
-                                        string[] otherapps = Configuration.OtherApps.Split(',');
-                                        foreach (string app in otherapps)
-                                        {
-                                            statusCon.WriteLine(ConsoleColor.Yellow,$"    -> Application '{app}'");
-                                            writer.Flush();
-                                            Logger.Log($"Installing Application with PackageID '{app}' ...");
-
-                                            p.StartInfo.Arguments = $"/c winget install --id {app}";
-                                            p.Start();
-                                            p.WaitForExit();
-
-                                            if (p.ExitCode != 0)
-                                            {
-                                                statusCon.WriteLine(ConsoleColor.Red, $"[!] Application '{app}' cannot be installed. Error: {p.ExitCode}");
-                                                writer.Flush();
-                                                Logger.Log($"Application '{app}' cannot be installed. Error: {p.ExitCode}");
-                                            }
-                                        }
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot download Remote maintenance software! Error: {status}");
+                                        Logger.Log("Cannot download Remote maintenance software!");
                                     }
+                                }
 
-                                    if (Configuration.RemoteMaintenance)
+                                if (Configuration.EnableNET35)
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> .NET Framework 3.5 ...");
+                                    writer.Flush();
+
+                                    status = Core.Actions.AppxManagement.InstallFeature("NetFx3");
+
+                                    switch (status)
                                     {
-                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remote maintenance software ...");
-                                        writer.Flush();
-                                        try
-                                        {
-                                            WebClient rms = new();
-                                            string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
-                                            string rmsFN = Path.Combine(publicDesktop, Configuration.RemoteMaintenanceFileName);
-                                            rms.DownloadFile(Configuration.RemoteMaintenanceURL, rmsFN);
-                                            Logger.Log("Remote maintenance software downloaded.");
-                                        }
-                                        catch
-                                        {
-                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot download Remote maintenance software! Error: {p.ExitCode}");
-                                            Logger.Log("Cannot download Remote maintenance software!");
-                                        }
-                                    }
+                                        case 0:
+                                            break;
 
-                                    if (Configuration.EnableNET35)
-                                    {
-                                        statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
-                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> .NET Framework 3.5 ...");
-                                        writer.Flush();
-                                        p.StartInfo.Arguments = $"/c \"dism /Online /Enable-Feature /All /FeatureName:NetFx3 /NoRestart\"";
-                                        p.Start();
-                                        p.WaitForExit();
-
-                                        if (p.ExitCode != 0 || p.ExitCode != 3010) // 3010 = ERROR_SUCCESS_REBOOT_REQUIRED
-                                        {
-                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] .NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
-                                            writer.Flush();
-                                            Logger.Log($".NET Framework 3.5 cannot be installed. Error: {p.ExitCode}");
-                                        }
-                                        if (p.ExitCode == 3010)
-                                        {
+                                        case 3010: // 3010 = ERROR_SUCCESS_REBOOT_REQUIRED
                                             statusCon.WriteLine(ConsoleColor.Yellow, $"[!] .NET Framework 3.5 was installed but a reboot is required!");
                                             writer.Flush();
                                             Logger.Log($".NET Framework 3.5 was installed but a reboot is required.");
-                                        }
-                                    }
+                                            break;
 
-                                    if (Configuration.EnableSMB1)
-                                    {
-                                        statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
-                                        statusCon.WriteLine(ConsoleColor.Yellow, "    -> SMB 1 Protocol ...");
-                                        writer.Flush();
-                                        p.StartInfo.Arguments = $"/c \"dism /Online /Enable-Feature /All /FeatureName:SMB1Protocol /NoRestart\"";
-                                        p.Start();
-                                        p.WaitForExit();
-
-                                        if (p.ExitCode != 0)
-                                        {
-                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
+                                        default:
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] .NET Framework 3.5 cannot be installed. Error: {status}");
                                             writer.Flush();
-                                            Logger.Log($"SMB 1 Protocol cannot be installed. Error: {p.ExitCode}");
-                                        }
-                                        if (p.ExitCode == 3010)
-                                        {
+                                            Logger.Log($".NET Framework 3.5 cannot be installed. Error: {status}");
+                                            break;
+                                    }
+                                }
+
+                                if (Configuration.EnableSMB1)
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
+                                    statusCon.WriteLine(ConsoleColor.Yellow, "    -> SMB 1 Protocol ...");
+                                    writer.Flush();
+
+                                    status = Core.Actions.AppxManagement.InstallFeature("SMB1Protocol");
+
+                                    switch (status)
+                                    {
+                                        case 0:
+                                            break;
+
+                                        case 3010: // 3010 = ERROR_SUCCESS_REBOOT_REQUIRED
                                             statusCon.WriteLine(ConsoleColor.Yellow, $"[!] SMB 1 Protocol was installed but a reboot is required!");
                                             writer.Flush();
                                             Logger.Log($"SMB 1 Protocol was installed but a reboot is required.");
-                                        }
-                                    }
+                                            break;
 
+                                        default:
+                                            statusCon.WriteLine(ConsoleColor.Red, $"[!] SMB 1 Protocol cannot be installed. Error: {status}");
+                                            writer.Flush();
+                                            Logger.Log($"SMB 1 Protocol cannot be installed. Error: {status}");
+                                            break;
+                                    }
                                 }
+
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Applications installed!");
                                 writer.Flush();
                                 Logger.Log("Applications installed!");

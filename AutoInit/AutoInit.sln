@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoInit", "AutoInit\AutoInit.csproj", "{4AD81E48-E472-4A7E-BC1B-AF350245961C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B3511DD9-111D-4970-8492-9A10B61DA234} = {B3511DD9-111D-4970-8492-9A10B61DA234}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoInit.UI", "AutoInit.UI\AutoInit.UI.csproj", "{2A671594-B5D8-414B-921A-C65A91266968}"
 EndProject
