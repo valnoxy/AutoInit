@@ -74,6 +74,6 @@
         <!--  The title bar contains window navigation elements and some Tray related extras.  -->
         <!--  You can put additional controls in the header, such as a search bar.  -->
         <!--  <ui:TitleBar.Header />  -->
-        <ui:TitleBar Title="AutoInit" Icon="pack://application:,,,/AutoInit.ico" Grid.Row="0"/>
+        <ui:TitleBar x:Name="Bar" Title="AutoInit" Icon="pack://application:,,,/AutoInit.ico" Grid.Row="0"/>
     </Grid>
 </ui:UiWindow>

@@ -1,87 +1,87 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Company>Wolkenhof</Company>
-    <Authors>Jonas Günner</Authors>
-    <Copyright>Copyright (c) 2018 - 2022 valnoxy. All rights reserved.</Copyright>
-    <PackageProjectUrl>https://valnoxy.dev</PackageProjectUrl>
-    <ApplicationIcon>AutoInit.ico</ApplicationIcon>
-	  <Version>1.1.0</Version> 
-    <PublishTrimmed>true</PublishTrimmed>
-	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-	<AssemblyVersion>1.1.0</AssemblyVersion>
-	<FileVersion>1.1.0</FileVersion>
-	<Platforms>AnyCPU;ARM64;x64</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Company>Wolkenhof</Company>
+		<Authors>Jonas Günner</Authors>
+		<Copyright>Copyright (c) 2018 - 2022 valnoxy. All rights reserved.</Copyright>
+		<PackageProjectUrl>https://valnoxy.dev</PackageProjectUrl>
+		<ApplicationIcon>AutoInit.ico</ApplicationIcon>
+		<Version>1.2.0</Version>
+		<PublishTrimmed>true</PublishTrimmed>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<AssemblyVersion>1.2.0</AssemblyVersion>
+		<FileVersion>1.2.0</FileVersion>
+		<Platforms>AnyCPU;ARM64;x64</Platforms>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="version.txt" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="version.txt" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="AutoInit.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="AutoInit.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="version.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="version.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
-    <PackageReference Include="NAudio" Version="2.1.0" />
-    <PackageReference Include="System.Management.Automation" Version="7.2.5" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
+		<PackageReference Include="NAudio" Version="2.1.0" />
+		<PackageReference Include="System.Management.Automation" Version="7.2.5" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Scripts.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Scripts.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Scripts.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Scripts.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Scripts.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Scripts.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Scripts.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Scripts.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Music\CRUDE - AVG Anti Spyware 7.5propercrk.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Music\CRUDE - XYplorer 5.10.0020kg.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Music\FFF-EfficientPIM.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Music\GEAR - WinRAR 3.xx + Rar consolecrk.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Music\TheSecret.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Music\tPORt - 1Click DVD Copy 4.2.1.5 kg.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Music\Xpose-end.mp3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Music\CRUDE - AVG Anti Spyware 7.5propercrk.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Music\CRUDE - XYplorer 5.10.0020kg.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Music\FFF-EfficientPIM.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Music\GEAR - WinRAR 3.xx + Rar consolecrk.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Music\TheSecret.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Music\tPORt - 1Click DVD Copy 4.2.1.5 kg.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Music\Xpose-end.mp3">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="git rev-parse --short HEAD &gt; &quot;$(ProjectDir)\version.txt&quot;" />
-  </Target>
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="git rev-parse --short HEAD &gt; &quot;$(ProjectDir)\version.txt&quot;" />
+	</Target>
 
 </Project>

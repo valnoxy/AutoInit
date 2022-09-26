@@ -12,6 +12,9 @@
 		<ApplicationIcon>AutoInit.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>AnyCPU;ARM64;x64</Platforms>
+		<Version>1.2.0</Version>
+		<AssemblyVersion>1.2.0</AssemblyVersion>
+		<FileVersion>1.2.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,7 +24,7 @@
 	<ItemGroup>
 		<Content Include="AutoInit.ico" />
 		<Resource Include="AutoInit.png">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Resource>
 	</ItemGroup>
 	

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
-namespace AutoInit
+namespace AutoInit.Core
 {
-    internal class Logger
+    public class Logger
     {
         private static string logFile;
 
-        public static string StartLogging()
+        public static string StartLogging(string Interface, string InterfaceVersion)
         {
             // Initialize logging
             DateTime today = DateTime.Now;
@@ -22,10 +16,13 @@ namespace AutoInit
             Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
             string appver = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build + "." + appVersion.Revision;
 
-            string logPath = AppContext.BaseDirectory;
-            string logName = $"AutoInit_{currentDate}_{currentTime}.log";
+            string logPath = Path.Combine(AppContext.BaseDirectory, "logs");
+            string logName = $"AutoInit_{Interface}_{currentDate}_{currentTime}.log";
             logFile = Path.Combine(logPath, logName);
-            
+
+            if (!Directory.Exists(logPath))
+                Directory.CreateDirectory(logPath);
+
             using (StreamWriter streamWriter = new StreamWriter(logFile))
             {
                 string introMsg =
@@ -33,7 +30,8 @@ namespace AutoInit
 Log file: {logFile}
 ===========================================================
 
-App Version: {appver}
+Core Version: {appver}
+AutoInit {Interface} Version: {InterfaceVersion}
 Windows Version: {Environment.OSVersion}
 
 ===========================================================";
@@ -58,6 +56,20 @@ Windows Version: {Environment.OSVersion}
                 tW.WriteLine(msg);
                 tW.Close();
             }
+        }
+
+        public static string? GetGitHash()
+        {
+            string gitVersion = String.Empty;
+            using Stream? stream = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("AutoInit." + "version.txt");
+            if (stream != null)
+            {
+                using StreamReader reader = new StreamReader(stream);
+                gitVersion = reader.ReadLine();
+            }
+
+            return gitVersion;
         }
     }
 }

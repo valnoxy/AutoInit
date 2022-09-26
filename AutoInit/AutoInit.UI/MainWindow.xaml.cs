@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -14,38 +15,43 @@ namespace AutoInit.UI
     /// </summary>
     public partial class MainWindow
     {
-        private BackgroundWorker bWSwitch = new BackgroundWorker();
-        private BackgroundWorker bWBloatware = new BackgroundWorker();
-        private BackgroundWorker bWSoftware = new BackgroundWorker();
-        private string AdminPassword;
+        private readonly BackgroundWorker _bWSwitch = new();
+        private readonly BackgroundWorker _bWBloatware = new();
+        private readonly BackgroundWorker _bWSoftware = new();
+        private string _adminPassword;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            if (TbPassword.Password.Length > 0)
-            {
-                SwitchActionCard.IsEnabled = true;
-            }
-            else
-            {
-                SwitchActionCard.IsEnabled = false;
-            }
+            Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            string appver = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build + "." + appVersion.Revision;
+            Core.Logger.StartLogging("UI", appver);
+
+            // Get git hash
+            string? gitHash = Core.Logger.GetGitHash();
+            Bar.Title = !String.IsNullOrEmpty(gitHash) ? $"AutoInit [Version: {appver} - {gitHash}]" : $"AutoInit [Version: {appver}]";
+
+            SwitchActionCard.IsEnabled = TbPassword.Password.Length > 0;
             // bWSwitch
-            bWSwitch.WorkerReportsProgress = true;
-            bWSwitch.WorkerSupportsCancellation = true;
-            bWSwitch.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
-            bWSwitch.DoWork += new DoWorkEventHandler(SwitchToAdmin_DoWork);
+            _bWSwitch.WorkerReportsProgress = true;
+            _bWSwitch.WorkerSupportsCancellation = true;
+            _bWSwitch.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            _bWSwitch.DoWork += new DoWorkEventHandler(SwitchToAdmin_DoWork);
+            Core.Logger.Log("bWSwitch initialized");
             // bWBloatware
-            bWBloatware.WorkerReportsProgress = true;
-            bWBloatware.WorkerSupportsCancellation = true;
-            bWBloatware.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
-            bWBloatware.DoWork += new DoWorkEventHandler(RemoveBloatware_DoWork);
+            _bWBloatware.WorkerReportsProgress = true;
+            _bWBloatware.WorkerSupportsCancellation = true;
+            _bWBloatware.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            _bWBloatware.DoWork += new DoWorkEventHandler(RemoveBloatware_DoWork);
+            Core.Logger.Log("bWBloatware initialized");
             // bWSoftware
-            bWSoftware.WorkerReportsProgress = true;
-            bWSoftware.WorkerSupportsCancellation = true;
-            bWSoftware.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
-            bWSoftware.DoWork += new DoWorkEventHandler(InstallSoftware_DoWork);
+            _bWSoftware.WorkerReportsProgress = true;
+            _bWSoftware.WorkerSupportsCancellation = true;
+            _bWSoftware.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
+            _bWSoftware.DoWork += new DoWorkEventHandler(InstallSoftware_DoWork);
+            Core.Logger.Log("bWSoftware initialized");
+            Core.Logger.Log("User Interface initialized");
         }
 
         #region Worker
@@ -55,66 +61,69 @@ namespace AutoInit.UI
             LockUI();
 
             // Call event handler to update progress bar
-            bWSwitch.ReportProgress(0);
+            _bWSwitch.ReportProgress(0);
 
             // Define status code integer
             int status;
 
             ReportAction("Change Administrator password ...");
-
+            Core.Logger.Log("Change Administrator password ...");
             status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(TbPassword.Password);
 
             if (status != 0)
             {
-                bWSwitch.ReportProgress(0);
+                _bWSwitch.ReportProgress(0);
                 ReportAction($"Cannot change password from Administrator account! Error: {status}");
+                Core.Logger.Log($"Cannot change password from Administrator account! Error: {status}");
                 UnlockUI();
-                bWSwitch.CancelAsync();
+                _bWSwitch.CancelAsync();
 
                 return;
             }
 
             // Call event handler to update progress bar
-            bWSwitch.ReportProgress(33);
+            _bWSwitch.ReportProgress(33);
             ReportAction("Enable Administrator account ...");
-            
+            Core.Logger.Log("Enable Administrator account ...");
             status = Core.Actions.SwitchToAdmin.EnableAdmin();
 
             if (status != 0)
             {
-                bWSwitch.ReportProgress(0);
+                _bWSwitch.ReportProgress(0);
 
                 ReportAction(status == 2
                     ? "Cannot enable Administrator account! The password does not meet the password policy requirements." // Policy error
                     : $"Cannot enable Administrator account! Error: {status}"); // Unknown error
+                Core.Logger.Log(status == 2
+                    ? "Cannot enable Administrator account! The password does not meet the password policy requirements." // Policy error
+                    : $"Cannot enable Administrator account! Error: {status}"); // Unknown error
                 UnlockUI();
-                bWSwitch.CancelAsync();
+                _bWSwitch.CancelAsync();
                 
                 return;
             }
 
             // Call event handler to update progress bar
-            bWSwitch.ReportProgress(66);
+            _bWSwitch.ReportProgress(66);
             ReportAction("Remove account 'User' ...");
-            
+            Core.Logger.Log("Remove account 'User' ...");
             status = Core.Actions.SwitchToAdmin.RemoveUser("User");
 
             if (status != 0)
             {
-                bWSwitch.ReportProgress(0);
+                _bWSwitch.ReportProgress(0);
                 ReportAction($"Cannot delete account 'User'! Error: {status}");
+                Core.Logger.Log($"Cannot delete account 'User'! Error: {status}");
                 UnlockUI();
-                bWSwitch.CancelAsync();
+                _bWSwitch.CancelAsync();
 
                 return;
             }
 
             // Call event handler to update progress bar
-            bWSwitch.ReportProgress(100);
-            
-            Dispatcher.Invoke(new Action(() => {
-                ActionLabel.Content = "Successfully switched to Administrator. Please log out now.";
-            }), DispatcherPriority.ContextIdle);
+            _bWSwitch.ReportProgress(100);
+            ReportAction("Successfully switched to Administrator. Please log out now.");
+            Core.Logger.Log("Successfully switched to Administrator. Please log out now.");
             UnlockUI();
         }
 
@@ -122,8 +131,9 @@ namespace AutoInit.UI
         {
             LockUI();
             int statuscode;
-            bWBloatware.ReportProgress(0);
+            _bWBloatware.ReportProgress(0);
             ReportAction("Removing bloatware ...");
+            Core.Logger.Log("Removing bloatware ...");
 
             // Initialize list of apps to remove
             AppxManagement.apps = new List<AppxManagement.App>();
@@ -187,19 +197,24 @@ namespace AutoInit.UI
                 ReportAction($"Removing {app.Name} ...");
                 
                 statuscode = AppxManagement.RemoveAppx(app.ID);
-                
-                if (statuscode != 0) ReportAction($"Cannot remove {app.Name}! Error: {statuscode}");
-                
+
+                if (statuscode != 0)
+                {
+                    ReportAction($"Cannot remove {app.Name}! Error: {statuscode}");
+                    Core.Logger.Log($"Cannot remove {app.Name}! Error: {statuscode}");
+                }
+
                 // Calculate progress bar content
                 double progressValue1 = (double)progress / (double)AppxManagement.apps.Count;
                 double progressValue2 = progressValue1 * 100;
                 int progressValue = Convert.ToInt32(progressValue2);
 
-                bWBloatware.ReportProgress(progressValue);
+                _bWBloatware.ReportProgress(progressValue);
             }
 
-            bWBloatware.ReportProgress(100);
+            _bWBloatware.ReportProgress(100);
             ReportAction("Bloatware removed!");
+            Core.Logger.Log("Bloatware removed!");
             UnlockUI();
         }
 
@@ -208,7 +223,8 @@ namespace AutoInit.UI
             LockUI();
 
             ReportAction("Installing software...");
-            bWSoftware.ReportProgress(0);
+            Core.Logger.Log("Installing software...");
+            _bWSoftware.ReportProgress(0);
             int status;
 
             // Check if winget is installed on the device
@@ -216,29 +232,34 @@ namespace AutoInit.UI
             if (!isWingetInstalled)
             {
                 ReportAction("Error: Winget not found. Please update App Installer!");
+                Core.Logger.Log("Error: Winget not found. Please update App Installer!");
                 UnlockUI();
-                bWSwitch.CancelAsync();
+                _bWSwitch.CancelAsync();
                 return;
             }
-            bWSoftware.ReportProgress(20);
+            _bWSoftware.ReportProgress(20);
 
             // Firefox
             ReportAction("Installing Firefox ...");
+            Core.Logger.Log("Installing Firefox ...");
             status = Core.Actions.AppxManagement.InstallApp("Mozilla.Firefox");
             if (status != 0)
             {
                 ReportAction($"Cannot install 'Firefox'. Error: {status}");
+                Core.Logger.Log($"Cannot install 'Firefox'. Error: {status}");
             }
-            bWSoftware.ReportProgress(40);
+            _bWSoftware.ReportProgress(40);
 
             // Adobe Acrobat Reader DC
             ReportAction("Installing Adobe Acrobat Reader DC ...");
+            Core.Logger.Log("Installing Adobe Acrobat Reader DC ...");
             status = Core.Actions.AppxManagement.InstallApp("Adobe.Acrobat.Reader.64-bit");
             if (status != 0)
             {
                 ReportAction($"Cannot install 'Adobe Acrobat Reader DC'. Error: {status}");
+                Core.Logger.Log($"Cannot install 'Adobe Acrobat Reader DC'. Error: {status}");
             }
-            bWSoftware.ReportProgress(60);
+            _bWSoftware.ReportProgress(60);
 
             // Remote Maintenance Tool
             ReportAction("Installing Remote Maintenance Tool ...");
@@ -248,11 +269,13 @@ namespace AutoInit.UI
             if (status != 0)
             {
                 ReportAction($"Cannot install Remote Maintenance Tool. Error: {status}");
+                Core.Logger.Log($"Cannot install Remote Maintenance Tool. Error: {status}");
             }
-            bWSoftware.ReportProgress(80);
+            _bWSoftware.ReportProgress(80);
 
             // Enable .NET Framework 3.5
             ReportAction("Installing Adobe Acrobat Reader DC ...");
+            Core.Logger.Log("Installing Adobe Acrobat Reader DC ...");
             status = Core.Actions.AppxManagement.InstallFeature("NetFx3");
             switch (status)
             {
@@ -261,13 +284,15 @@ namespace AutoInit.UI
 
                 case 3010: // 3010 = ERROR_SUCCESS_REBOOT_REQUIRED
                     ReportAction($".NET Framework 3.5 was installed but a reboot is required!");
+                    Core.Logger.Log($".NET Framework 3.5 was installed but a reboot is required!");
                     break;
 
                 default:
                     ReportAction($".NET Framework 3.5 cannot be installed. Error: {status}");
+                    Core.Logger.Log($".NET Framework 3.5 cannot be installed. Error: {status}");
                     break;
             }
-            bWSoftware.ReportProgress(100);
+            _bWSoftware.ReportProgress(100);
             UnlockUI();
         }
 
@@ -317,9 +342,9 @@ namespace AutoInit.UI
 
         #region Actions
 
-        public void SwitchToAdmin_Click(object sender, RoutedEventArgs e) => bWSwitch.RunWorkerAsync();
-        public void RemoveBloatware_Click(object sender, RoutedEventArgs e) => bWBloatware.RunWorkerAsync();
-        public void InstallActionCard_Click(object sender, RoutedEventArgs e) => bWSoftware.RunWorkerAsync();
+        public void SwitchToAdmin_Click(object sender, RoutedEventArgs e) => _bWSwitch.RunWorkerAsync();
+        public void RemoveBloatware_Click(object sender, RoutedEventArgs e) => _bWBloatware.RunWorkerAsync();
+        public void InstallActionCard_Click(object sender, RoutedEventArgs e) => _bWSoftware.RunWorkerAsync();
         void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => ProgrBar.Value = e.ProgressPercentage;
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -332,7 +357,7 @@ namespace AutoInit.UI
             if (TbPassword.Password.Length > 0)
             {
                 SwitchActionCard.IsEnabled = true;
-                AdminPassword = TbPassword.Password;
+                _adminPassword = TbPassword.Password;
             }
             else
             {
