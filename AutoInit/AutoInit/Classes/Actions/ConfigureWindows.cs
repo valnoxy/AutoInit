@@ -111,15 +111,15 @@ namespace AutoInit
             bool status = true;
             string DebugInfoType = "";
 
-            if (Configuration.SPMaxMemoryDump == "None")
+            if (Core.Configuration.SPMaxMemoryDump == "None")
                 DebugInfoType = "0";
-            else if (Configuration.SPMaxMemoryDump == "Complete")
+            else if (Core.Configuration.SPMaxMemoryDump == "Complete")
                 DebugInfoType = "1";
-            else if (Configuration.SPMaxMemoryDump == "Kernel")
+            else if (Core.Configuration.SPMaxMemoryDump == "Kernel")
                 DebugInfoType = "2";
-            else if (Configuration.SPMaxMemoryDump == "Small")
+            else if (Core.Configuration.SPMaxMemoryDump == "Small")
                 DebugInfoType = "3";
-            else if (Configuration.SPMaxMemoryDump == "Auto")
+            else if (Core.Configuration.SPMaxMemoryDump == "Auto")
                 DebugInfoType = "7";
 
             int a = RunProcess("wmic.exe", $"recoveros set DebugInfoType = {DebugInfoType}"); 

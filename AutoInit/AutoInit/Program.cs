@@ -13,7 +13,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoInit.Core;
-using AutoInit.Core.Actions;
 
 namespace AutoInit
 {
@@ -21,38 +20,6 @@ namespace AutoInit
     {
         public static class AutoInit
         {
-            public class Configuration
-            {
-                public static string _ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
-
-                // AutoInit
-                public static string AdminPassword;
-                public static string DefaultUsername;
-                public static bool RemoveDefaultUser;
-                public static bool BackgroundMusic;
-
-                // Applications
-                public static string PackageID_Firefox;
-                public static string PackageID_AcrobatReader;
-                public static bool InstallFirefox;
-                public static bool InstallAcrobatReader;
-                public static bool EnableSMB1;
-                public static bool EnableNET35;
-                public static bool RemoteMaintenance;
-                public static string RemoteMaintenanceURL;
-                public static string RemoteMaintenanceFileName;
-                public static string OtherApps;
-
-                // Settings
-                public static bool DisableTelemetry;
-                public static bool CheckActivation;
-                public static string SystemProtection;
-                public static bool DisableAutoRebootAfterBSOD;
-                public static string SPMaxMemoryDump;
-                public static bool SetMaxPerformance;
-                public static bool DisableFastBoot;
-            }
-
             // Main Menu switches
             static bool finished = false;
             static bool switchToAdmin = false;
@@ -91,13 +58,13 @@ namespace AutoInit
 
                         if (args[0] == "--deployment")
                         {
-                            Configuration.RemoveDefaultUser = false;
-                            Configuration.BackgroundMusic = false;
-                            Configuration.EnableNET35 = true;
-                            Configuration.EnableSMB1 = false;
-                            Configuration.RemoteMaintenance = true;
-                            Configuration.RemoteMaintenanceURL = "https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe";
-                            Configuration.RemoteMaintenanceFileName = "Fernwartung Wolkenhof.exe";
+                            Core.Configuration.RemoveDefaultUser = false;
+                            Core.Configuration.BackgroundMusic = false;
+                            Core.Configuration.EnableNET35 = true;
+                            Core.Configuration.EnableSMB1 = false;
+                            Core.Configuration.RemoteMaintenance = true;
+                            Core.Configuration.RemoteMaintenanceURL = "https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe";
+                            Core.Configuration.RemoteMaintenanceFileName = "Fernwartung Wolkenhof.exe";
 
                             AppxRemove.RemoveAppx("Microsoft.Appconnector");
                             AppxRemove.RemoveAppx("Microsoft.549981C3F5F10");
@@ -156,8 +123,8 @@ namespace AutoInit
                             {
                                 WebClient rms = new();
                                 string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
-                                string rmsFN = Path.Combine(publicDesktop, Configuration.RemoteMaintenanceFileName);
-                                rms.DownloadFile(Configuration.RemoteMaintenanceURL, rmsFN);
+                                string rmsFN = Path.Combine(publicDesktop, Core.Configuration.RemoteMaintenanceFileName);
+                                rms.DownloadFile(Core.Configuration.RemoteMaintenanceURL, rmsFN);
                             }
                             catch {;}
 
@@ -195,10 +162,10 @@ namespace AutoInit
                 CheckForUpdates();
 
                 // Verify the existance of the config file
-                if (!File.Exists(Configuration._ConfigurationFile))
+                if (!File.Exists(Core.Configuration.ConfigurationFile))
                 {
-                    Logger.Log("ERROR: No configuation file found. (File missing: config.ini)");
-                    Console.WriteLine("ERROR: No configuation file found. (File missing: config.ini)");
+                    Logger.Log("ERROR: No configuration file found. (File missing: config.ini)");
+                    Console.WriteLine("ERROR: No configuration file found. (File missing: config.ini)");
                     Console.Write("       Do you want to create a new one? (Y/N): ");
                     string answer = Console.ReadLine();
                     if (answer.ToLower() == "y")
@@ -222,7 +189,7 @@ namespace AutoInit
                 InitConfiguration();
 
                 // Initialize background music
-                if (Configuration.BackgroundMusic)
+                if (Core.Configuration.BackgroundMusic)
                 {
                     var music = Task.Run(() =>
                     {
@@ -427,137 +394,137 @@ DisableFastBoot = true";
                 //
                 // Reading Configuration
                 //
-                var ConfigIni = new IniFile(Configuration._ConfigurationFile);
+                var ConfigIni = new IniFile(Core.Configuration.ConfigurationFile);
                 
-                Configuration.AdminPassword = ConfigIni.Read("AdminPassword", "AutoInit");
-                Configuration.DefaultUsername = ConfigIni.Read("DefaultUsername", "AutoInit");
+                Core.Configuration.AdminPassword = ConfigIni.Read("AdminPassword", "AutoInit");
+                Core.Configuration.DefaultUsername = ConfigIni.Read("DefaultUsername", "AutoInit");
 
                 if (ConfigIni.Read("RemoveDefaultUser", "AutoInit") == "true")
-                    Configuration.RemoveDefaultUser = true;
+                    Core.Configuration.RemoveDefaultUser = true;
                 else
-                    Configuration.RemoveDefaultUser = false;
+                    Core.Configuration.RemoveDefaultUser = false;
 
                 if (ConfigIni.Read("BackgroundMusic", "AutoInit") == "true")
-                    Configuration.BackgroundMusic = true;
+                    Core.Configuration.BackgroundMusic = true;
                 else
-                    Configuration.BackgroundMusic = false;
+                    Core.Configuration.BackgroundMusic = false;
 
-                Configuration.PackageID_AcrobatReader = ConfigIni.Read("PackageID_AcrobatReader", "Application");
-                Configuration.PackageID_Firefox = ConfigIni.Read("PackageID_Firefox", "Application");
+                Core.Configuration.PackageID_AcrobatReader = ConfigIni.Read("PackageID_AcrobatReader", "Application");
+                Core.Configuration.PackageID_Firefox = ConfigIni.Read("PackageID_Firefox", "Application");
 
                 if (ConfigIni.Read("InstallFirefox", "Application") == "true")
-                    Configuration.InstallFirefox = true;
+                    Core.Configuration.InstallFirefox = true;
                 else
-                    Configuration.InstallFirefox = false;
+                    Core.Configuration.InstallFirefox = false;
 
                 if (ConfigIni.Read("InstallAcrobatReader", "Application") == "true")
-                    Configuration.InstallAcrobatReader = true;
+                    Core.Configuration.InstallAcrobatReader = true;
                 else
-                    Configuration.InstallAcrobatReader = false;
+                    Core.Configuration.InstallAcrobatReader = false;
 
                 if (ConfigIni.Read("EnableSMB1", "Application") == "true")
-                    Configuration.EnableSMB1 = true;
+                    Core.Configuration.EnableSMB1 = true;
                 else
-                    Configuration.EnableSMB1 = false;
+                    Core.Configuration.EnableSMB1 = false;
 
                 if (ConfigIni.Read("EnableNET35", "Application") == "true")
-                    Configuration.EnableNET35 = true;
+                    Core.Configuration.EnableNET35 = true;
                 else
-                    Configuration.EnableNET35 = false;
+                    Core.Configuration.EnableNET35 = false;
 
                 if (ConfigIni.Read("RemoteMaintenance", "Application") == "true")
-                    Configuration.RemoteMaintenance = true;
+                    Core.Configuration.RemoteMaintenance = true;
                 else
-                    Configuration.RemoteMaintenance = false;
+                    Core.Configuration.RemoteMaintenance = false;
 
-                Configuration.RemoteMaintenanceURL = ConfigIni.Read("RemoteMaintenanceURL", "Application");
-                Configuration.RemoteMaintenanceFileName = ConfigIni.Read("RemoteMaintenanceFileName", "Application");
-                Configuration.OtherApps = ConfigIni.Read("OtherApps", "Application");
+                Core.Configuration.RemoteMaintenanceURL = ConfigIni.Read("RemoteMaintenanceURL", "Application");
+                Core.Configuration.RemoteMaintenanceFileName = ConfigIni.Read("RemoteMaintenanceFileName", "Application");
+                Core.Configuration.OtherApps = ConfigIni.Read("OtherApps", "Application");
 
                 if (ConfigIni.Read("DisableTelemetry", "Settings") == "true")
-                    Configuration.DisableTelemetry = true;
+                    Core.Configuration.DisableTelemetry = true;
                 else
-                    Configuration.DisableTelemetry = false;
+                    Core.Configuration.DisableTelemetry = false;
 
                 if (ConfigIni.Read("CheckActivation", "Settings") == "true")
-                    Configuration.CheckActivation = true;
+                    Core.Configuration.CheckActivation = true;
                 else
-                    Configuration.CheckActivation = false;
+                    Core.Configuration.CheckActivation = false;
 
-                Configuration.SystemProtection = ConfigIni.Read("SystemProtection", "Settings");
+                Core.Configuration.SystemProtection = ConfigIni.Read("SystemProtection", "Settings");
 
                 if (ConfigIni.Read("DisableAutoRebootAfterBSOD", "Settings") == "true")
-                    Configuration.DisableAutoRebootAfterBSOD = true;
+                    Core.Configuration.DisableAutoRebootAfterBSOD = true;
                 else
-                    Configuration.DisableAutoRebootAfterBSOD = false;
+                    Core.Configuration.DisableAutoRebootAfterBSOD = false;
 
-                Configuration.SPMaxMemoryDump = ConfigIni.Read("SPMaxMemoryDump", "Settings");
+                Core.Configuration.SPMaxMemoryDump = ConfigIni.Read("SPMaxMemoryDump", "Settings");
 
                 if (ConfigIni.Read("SetMaxPerformance", "Settings") == "true")
-                    Configuration.SetMaxPerformance = true;
+                    Core.Configuration.SetMaxPerformance = true;
                 else
-                    Configuration.SetMaxPerformance = false;
+                    Core.Configuration.SetMaxPerformance = false;
 
                 if (ConfigIni.Read("DisableFastBoot", "Settings") == "true")
-                    Configuration.DisableFastBoot = true;
+                    Core.Configuration.DisableFastBoot = true;
                 else
-                    Configuration.DisableFastBoot = false;
+                    Core.Configuration.DisableFastBoot = false;
 
                 Logger.Log("Config loaded.");                
                 
                 //
                 // Validating Configuration
                 //
-                if (Configuration.AdminPassword == "")
+                if (Core.Configuration.AdminPassword == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No AdminPassword set)");
                     Logger.Log("ERROR: Configuation file invalid. (No AdminPassword set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.DefaultUsername == "")
+                if (Core.Configuration.DefaultUsername == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No DefaultUsername set)");
                     Logger.Log("ERROR: Configuation file invalid. (No DefaultUsername set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.PackageID_Firefox == "")
+                if (Core.Configuration.PackageID_Firefox == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No PackageID_Firefox set)");
                     Logger.Log("ERROR: Configuation file invalid. (No PackageID_Firefox set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.PackageID_AcrobatReader == "")
+                if (Core.Configuration.PackageID_AcrobatReader == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No PackageID_AcrobatReader set)");
                     Logger.Log("ERROR: Configuation file invalid. (No PackageID_AcrobatReader set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.RemoteMaintenanceURL == "")
+                if (Core.Configuration.RemoteMaintenanceURL == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No RemoteMaintenanceURL set)");
                     Logger.Log("ERROR: Configuation file invalid. (No RemoteMaintenanceURL set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.RemoteMaintenanceFileName == "")
+                if (Core.Configuration.RemoteMaintenanceFileName == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No RemoteMaintenanceFileName set)");
                     Logger.Log("ERROR: Configuation file invalid. (No RemoteMaintenanceFileName set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.SystemProtection == "")
+                if (Core.Configuration.SystemProtection == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No SystemProtection set)");
                     Logger.Log("ERROR: Configuation file invalid. (No SystemProtection set)");
                     Thread.Sleep(3);
                     Environment.Exit(1);
                 }
-                if (Configuration.SPMaxMemoryDump == "")
+                if (Core.Configuration.SPMaxMemoryDump == "")
                 {
                     Console.WriteLine("ERROR: Configuation file invalid. (No SPMaxMemoryDump set)");
                     Logger.Log("ERROR: Configuation file invalid. (No SPMaxMemoryDump set)");
@@ -638,7 +605,7 @@ DisableFastBoot = true";
                                 
                                 if (status != 0)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot enable Administrator account! Error: {p.ExitCode}");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot enable Administrator account!");
                                     writer.Flush();
                                     switchToAdmin = false;
                                     break;
@@ -648,26 +615,26 @@ DisableFastBoot = true";
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Change Administrator password ...");
                                 writer.Flush();
 
-                                status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(Configuration.AdminPassword);
+                                status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(Core.Configuration.AdminPassword);
 
                                 if (status != 0)
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot change password from Administrator account! Error: {p.ExitCode}");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot change password from Administrator account!");
                                     writer.Flush();
                                     switchToAdmin = false;
                                     break;
                                 }
 
-                                if (Configuration.RemoveDefaultUser)
+                                if (Core.Configuration.RemoveDefaultUser)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remove User account ...");
                                     writer.Flush();
 
-                                    status = Core.Actions.SwitchToAdmin.RemoveUser(Configuration.DefaultUsername);
+                                    status = Core.Actions.SwitchToAdmin.RemoveUser(Core.Configuration.DefaultUsername);
 
                                     if (status != 0)
                                     {
-                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot delete account '{Configuration.DefaultUsername}'! Error: {p.ExitCode}");
+                                        statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot delete account '{Core.Configuration.DefaultUsername}'!");
                                         writer.Flush();
                                         switchToAdmin = false;
                                         break;
@@ -791,13 +758,13 @@ DisableFastBoot = true";
                                 writer.Flush();
                                 Logger.Log("Installing Applications with WinGet ...");
 
-                                if (Configuration.InstallFirefox)
+                                if (Core.Configuration.InstallFirefox)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Firefox ...");
                                     writer.Flush();
                                     Logger.Log("Installing Firefox ...");
 
-                                    status = Core.Actions.AppxManagement.InstallApp(Configuration.PackageID_Firefox);
+                                    status = Core.Actions.AppxManagement.InstallApp(Core.Configuration.PackageID_Firefox);
 
                                     if (status != 0)
                                     {
@@ -807,13 +774,13 @@ DisableFastBoot = true";
                                     }
                                 }
 
-                                if (Configuration.InstallAcrobatReader)
+                                if (Core.Configuration.InstallAcrobatReader)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Adobe Acrobat Reader DC ...");
                                     writer.Flush();
                                     Logger.Log("Installing Adobe Acrobat Reader DC ...");
 
-                                    status = Core.Actions.AppxManagement.InstallApp(Configuration.PackageID_AcrobatReader);
+                                    status = Core.Actions.AppxManagement.InstallApp(Core.Configuration.PackageID_AcrobatReader);
 
                                     if (status != 0)
                                     {
@@ -823,9 +790,9 @@ DisableFastBoot = true";
                                     }
                                 }
 
-                                if (!String.IsNullOrEmpty(Configuration.OtherApps))
+                                if (!String.IsNullOrEmpty(Core.Configuration.OtherApps))
                                 {
-                                    string[] otherapps = Configuration.OtherApps.Split(',');
+                                    string[] otherapps = Core.Configuration.OtherApps.Split(',');
                                     foreach (string app in otherapps)
                                     {
                                         statusCon.WriteLine(ConsoleColor.Yellow,$"    -> Application '{app}'");
@@ -843,16 +810,16 @@ DisableFastBoot = true";
                                     }
                                 }
 
-                                if (Configuration.RemoteMaintenance)
+                                if (Core.Configuration.RemoteMaintenance)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remote maintenance software ...");
                                     writer.Flush();
 
                                     string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
-                                    string rmsFn = Path.Combine(publicDesktop, Configuration.RemoteMaintenanceFileName);
+                                    string rmsFn = Path.Combine(publicDesktop, Core.Configuration.RemoteMaintenanceFileName);
                                     Logger.Log("Remote maintenance software downloaded.");
                                     
-                                    status = Core.Actions.AppxManagement.InstallRM(Configuration.RemoteMaintenanceURL, rmsFn);
+                                    status = Core.Actions.AppxManagement.InstallRM(Core.Configuration.RemoteMaintenanceURL, rmsFn);
 
                                     if (status != 0) 
                                     {
@@ -861,7 +828,7 @@ DisableFastBoot = true";
                                     }
                                 }
 
-                                if (Configuration.EnableNET35)
+                                if (Core.Configuration.EnableNET35)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> .NET Framework 3.5 ...");
@@ -888,7 +855,7 @@ DisableFastBoot = true";
                                     }
                                 }
 
-                                if (Configuration.EnableSMB1)
+                                if (Core.Configuration.EnableSMB1)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Green, "[i] Installing Windows Features ...");
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> SMB 1 Protocol ...");
@@ -940,7 +907,7 @@ DisableFastBoot = true";
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Configure Windows Installation ...");
 
                                 #region Telemetry
-                                if (Configuration.DisableTelemetry)
+                                if (Core.Configuration.DisableTelemetry)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Green, "[i] Disable Telemetry ...");
                                     writer.Flush();
@@ -1027,7 +994,7 @@ DisableFastBoot = true";
                                 #endregion
 
                                 #region Windows Activation
-                                if (Configuration.CheckActivation)
+                                if (Core.Configuration.CheckActivation)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Green, "[i] Checking system ...");
                                     writer.Flush();
@@ -1053,7 +1020,7 @@ DisableFastBoot = true";
                                 Logger.Log("Tweaking Windows ...");
 
                                 #region Disable auto reboot after BSOD
-                                if (Configuration.DisableAutoRebootAfterBSOD)
+                                if (Core.Configuration.DisableAutoRebootAfterBSOD)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable auto reboot after BSOD ...");
                                     writer.Flush();
@@ -1082,20 +1049,20 @@ DisableFastBoot = true";
                                 #endregion
 
                                 #region System proection
-                                statusCon.WriteLine(ConsoleColor.Yellow, $"    -> Enable System protection (max. Usage: {Configuration.SystemProtection}) ...");
+                                statusCon.WriteLine(ConsoleColor.Yellow, $"    -> Enable System protection (max. Usage: {Core.Configuration.SystemProtection}) ...");
                                 writer.Flush();
-                                Logger.Log($"Enable System protection (max. Usage: {Configuration.SystemProtection}) ...");
+                                Logger.Log($"Enable System protection (max. Usage: {Core.Configuration.SystemProtection}) ...");
                                 
                                 if (!ConfigureWindows.ShadowStorage())
                                 {
-                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max Usage of System protection to {Configuration.SystemProtection}.");
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot set max Usage of System protection to {Core.Configuration.SystemProtection}.");
                                     writer.Flush();
-                                    Logger.Log($"Cannot set max Usage of System protection to {Configuration.SystemProtection}.");
+                                    Logger.Log($"Cannot set max Usage of System protection to {Core.Configuration.SystemProtection}.");
                                 }
                                 #endregion
 
                                 #region Performance plan
-                                if (Configuration.SetMaxPerformance)
+                                if (Core.Configuration.SetMaxPerformance)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Set power plan to High Performance ...");
                                     writer.Flush();
@@ -1111,7 +1078,7 @@ DisableFastBoot = true";
                                 #endregion
 
                                 #region Fast Boot
-                                if (Configuration.DisableFastBoot)
+                                if (Core.Configuration.DisableFastBoot)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Disable Fast Boot ...");
                                     writer.Flush();
@@ -1141,7 +1108,7 @@ DisableFastBoot = true";
                     var info = infoCon.SplitLeft("Information");
                     var matrix = infoCon.SplitRight("Skull");
 
-                    info.WriteLine($"\nAdministrator Password:\n{Configuration.AdminPassword}\n\nDefault Username:\n{Configuration.DefaultUsername}\n\nPress up and down to select.\nPress ESC to exit.");
+                    info.WriteLine($"\nAdministrator Password:\n{Core.Configuration.AdminPassword}\n\nDefault Username:\n{Core.Configuration.DefaultUsername}\n\nPress up and down to select.\nPress ESC to exit.");
                     matrix.ForegroundColor = ConsoleColor.Green;
                     matrix.WriteLine(@"");
                     matrix.WriteLine(@"     |             /  |  ");

@@ -1,0 +1,35 @@
+﻿<Page x:Class="AutoInit.UI.Pages.Dashboard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AutoInit.UI.Pages"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="75"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Row="0" Margin="15,0,15,0">
+            <StackPanel>
+                <Label Content="Dashboard" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Row="1" Margin="15,0,15,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <ui:CardAction x:Name="SwitchActionCard" Icon="PersonSwap24" Content="Switch to Administrator" Margin="0,0,0,10" IsEnabled="true" Click="SwitchActionCard_OnClick"/>
+                    <ui:CardAction x:Name="RemoveActionCard" Icon="Delete24" Content="Remove Bloatware" Margin="0,0,0,10" IsEnabled="true" Click="RemoveActionCard_OnClick"/>
+                    <ui:CardAction x:Name="InstallActionCard" Icon="ArrowDownload48" Content="Install Software" Margin="0,0,0,10" IsEnabled="true"/>
+                    <ui:CardAction x:Name="ConfigureActionCard" Icon="WindowSettings20" Content="Configure Windows" Margin="0,0,0,10" IsEnabled="false"/>
+                    <ui:CardAction x:Name="ReinstallActionCard" Icon="ArrowReset32" Content="Reinstall Windows" Margin="0,0,0,10" IsEnabled="false"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

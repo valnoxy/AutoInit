@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using AutoInit.Core.Actions;
+using AutoInit.UI.Pages;
 
 namespace AutoInit.UI
 {
@@ -20,19 +22,24 @@ namespace AutoInit.UI
         private readonly BackgroundWorker _bWSoftware = new();
         private string _adminPassword;
 
+        public static MainWindow? ContentWindow;
+        private static Page dashboardPage;
+        public static Page SwitchToAdminPage = new SwitchToAdminPage();
+
         public MainWindow()
         {
             InitializeComponent();
+            
+            dashboardPage = new Pages.Dashboard();
+            FrameWindow.Content = dashboardPage;
 
             Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
             string appver = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build + "." + appVersion.Revision;
             Core.Logger.StartLogging("UI", appver);
+            VersionString.Text = $"[{appver}]";
 
-            // Get git hash
-            string? gitHash = Core.Logger.GetGitHash();
-            Bar.Title = !String.IsNullOrEmpty(gitHash) ? $"AutoInit [Version: {appver} - {gitHash}]" : $"AutoInit [Version: {appver}]";
+            // Bar.Title = !String.IsNullOrEmpty(gitHash) ? $"AutoInit [Version: {appver} - {gitHash}]" : $"AutoInit [Version: {appver}]";
 
-            SwitchActionCard.IsEnabled = TbPassword.Password.Length > 0;
             // bWSwitch
             _bWSwitch.WorkerReportsProgress = true;
             _bWSwitch.WorkerSupportsCancellation = true;
@@ -52,14 +59,13 @@ namespace AutoInit.UI
             _bWSoftware.DoWork += new DoWorkEventHandler(InstallSoftware_DoWork);
             Core.Logger.Log("bWSoftware initialized");
             Core.Logger.Log("User Interface initialized");
+            
         }
 
         #region Worker
 
         void SwitchToAdmin_DoWork(object sender, DoWorkEventArgs e)
         {
-            LockUI();
-
             // Call event handler to update progress bar
             _bWSwitch.ReportProgress(0);
 
@@ -68,14 +74,13 @@ namespace AutoInit.UI
 
             ReportAction("Change Administrator password ...");
             Core.Logger.Log("Change Administrator password ...");
-            status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(TbPassword.Password);
+            status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(Config.SwitchToAdmin.Password);
 
             if (status != 0)
             {
                 _bWSwitch.ReportProgress(0);
                 ReportAction($"Cannot change password from Administrator account! Error: {status}");
                 Core.Logger.Log($"Cannot change password from Administrator account! Error: {status}");
-                UnlockUI();
                 _bWSwitch.CancelAsync();
 
                 return;
@@ -97,39 +102,38 @@ namespace AutoInit.UI
                 Core.Logger.Log(status == 2
                     ? "Cannot enable Administrator account! The password does not meet the password policy requirements." // Policy error
                     : $"Cannot enable Administrator account! Error: {status}"); // Unknown error
-                UnlockUI();
                 _bWSwitch.CancelAsync();
                 
                 return;
             }
 
-            // Call event handler to update progress bar
-            _bWSwitch.ReportProgress(66);
-            ReportAction("Remove account 'User' ...");
-            Core.Logger.Log("Remove account 'User' ...");
-            status = Core.Actions.SwitchToAdmin.RemoveUser("User");
-
-            if (status != 0)
+            // Remove User
+            if (Config.SwitchToAdmin.RemoveCurrentUser == true)
             {
-                _bWSwitch.ReportProgress(0);
-                ReportAction($"Cannot delete account 'User'! Error: {status}");
-                Core.Logger.Log($"Cannot delete account 'User'! Error: {status}");
-                UnlockUI();
-                _bWSwitch.CancelAsync();
+                _bWSwitch.ReportProgress(66);
+                ReportAction($"Remove current account '{Environment.UserName}' ...");
+                Core.Logger.Log($"Remove account '{Environment.UserName}' ...");
+                status = Core.Actions.SwitchToAdmin.RemoveUser(Environment.UserName);
 
-                return;
+                if (status != 0)
+                {
+                    _bWSwitch.ReportProgress(0);
+                    ReportAction($"Cannot delete account '{Environment.UserName}'! Error: {status}");
+                    Core.Logger.Log($"Cannot delete account '{Environment.UserName}'! Error: {status}");
+                    _bWSwitch.CancelAsync();
+
+                    return;
+                }
             }
 
             // Call event handler to update progress bar
             _bWSwitch.ReportProgress(100);
             ReportAction("Successfully switched to Administrator. Please log out now.");
             Core.Logger.Log("Successfully switched to Administrator. Please log out now.");
-            UnlockUI();
         }
 
         void RemoveBloatware_DoWork(object sender, DoWorkEventArgs e)
         {
-            LockUI();
             int statuscode;
             _bWBloatware.ReportProgress(0);
             ReportAction("Removing bloatware ...");
@@ -215,13 +219,10 @@ namespace AutoInit.UI
             _bWBloatware.ReportProgress(100);
             ReportAction("Bloatware removed!");
             Core.Logger.Log("Bloatware removed!");
-            UnlockUI();
         }
 
         private void InstallSoftware_DoWork(object sender, DoWorkEventArgs e)
         {
-            LockUI();
-
             ReportAction("Installing software...");
             Core.Logger.Log("Installing software...");
             _bWSoftware.ReportProgress(0);
@@ -233,7 +234,6 @@ namespace AutoInit.UI
             {
                 ReportAction("Error: Winget not found. Please update App Installer!");
                 Core.Logger.Log("Error: Winget not found. Please update App Installer!");
-                UnlockUI();
                 _bWSwitch.CancelAsync();
                 return;
             }
@@ -293,44 +293,12 @@ namespace AutoInit.UI
                     break;
             }
             _bWSoftware.ReportProgress(100);
-            UnlockUI();
         }
 
         #endregion
 
         #region Functions
-
-        private void LockUI()
-        {
-            Dispatcher.Invoke(new Action(() => {
-                TbPassword.IsEnabled = false;
-                SwitchActionCard.IsEnabled = false;
-                RemoveActionCard.IsEnabled = false;
-                InstallActionCard.IsEnabled = false;
-                ConfigureActionCard.IsEnabled = false;
-                ReinstallActionCard.IsEnabled = false;
-            }), DispatcherPriority.ContextIdle);
-        }
-
-        private void UnlockUI()
-        {
-            Dispatcher.Invoke(new Action(() => {
-                TbPassword.IsEnabled = true;
-                if (TbPassword.Password.Length > 0)
-                {
-                    SwitchActionCard.IsEnabled = true;
-                }
-                else
-                {
-                    SwitchActionCard.IsEnabled = false;
-                }
-                RemoveActionCard.IsEnabled = true;
-                InstallActionCard.IsEnabled = true;
-                ConfigureActionCard.IsEnabled = true;
-                ReinstallActionCard.IsEnabled = true;
-            }), DispatcherPriority.ContextIdle);
-        }
-
+        
         private void ReportAction(string s)
         {
             Dispatcher.Invoke(new Action(() => {
@@ -342,7 +310,6 @@ namespace AutoInit.UI
 
         #region Actions
 
-        public void SwitchToAdmin_Click(object sender, RoutedEventArgs e) => _bWSwitch.RunWorkerAsync();
         public void RemoveBloatware_Click(object sender, RoutedEventArgs e) => _bWBloatware.RunWorkerAsync();
         public void InstallActionCard_Click(object sender, RoutedEventArgs e) => _bWSoftware.RunWorkerAsync();
         void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) => ProgrBar.Value = e.ProgressPercentage;
@@ -351,21 +318,33 @@ namespace AutoInit.UI
         {
             Environment.Exit(0);
         }
+        
+        #endregion
 
-        private void TbPassword_OnTextChanged(object sender, TextChangedEventArgs e)
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            if (TbPassword.Password.Length > 0)
+            switch (FrameWindow.Content)
             {
-                SwitchActionCard.IsEnabled = true;
-                _adminPassword = TbPassword.Password;
-            }
-            else
-            {
-                SwitchActionCard.IsEnabled = false;
+                case Pages.SwitchToAdminPage:
+                    _bWSwitch.RunWorkerAsync();
+                    break;
+
+                default:
+                    break;
             }
         }
 
-        #endregion
-
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            switch (FrameWindow.Content)
+            {
+                case AutoInit.UI.Pages.SwitchToAdminPage:
+                    FrameWindow.Content = dashboardPage;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

@@ -1,0 +1,50 @@
+﻿<Page x:Class="AutoInit.UI.Pages.SwitchToAdminPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AutoInit.UI.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="SwitchToAdminPage">
+
+    <Grid Margin="15,0,15,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="75"/>
+        </Grid.RowDefinitions>
+
+        <Grid Row="0">
+            <StackPanel>
+                <Label Content="Switch to Administrator" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+            </StackPanel>
+        </Grid>
+        
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <Label x:Name="CurrentUserLb" Content="Current User: n/a" FontSize="15" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Password" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <ui:PasswordBox x:Name="PasswordBox" Grid.Column="1" Icon="Key24" TextChanged="PasswortBox_TextChanged"/>
+            </Grid>
+
+            <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                <CheckBox x:Name="RemoveUserCb" Content="Remove current User" IsChecked="True" Checked="RemoveUserCb_Checked" Unchecked="RemoveUserCb_Checked"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

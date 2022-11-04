@@ -11,49 +11,26 @@
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
         WindowCornerPreference="Round"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="75"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
+        
+        <!--  We display our pages inside this element.  -->
+        <Border
+            Grid.Row="1"
+            CornerRadius="8,0,0,0">
+            <Frame x:Name="FrameWindow" />
+        </Border>
 
-        <Grid Row="1" Margin="15,0,15,0">
-            <StackPanel>
-                <Label Content="Information" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                <Grid Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        FontSize="14"
-                        Margin="0,6,0,0"
-                        Text="Password" />
-                    <ui:PasswordBox x:Name="TbPassword" Grid.Column="1" Icon="Key24" PlaceholderText="New Password for Administrator" TextChanged="TbPassword_OnTextChanged"/>
-                </Grid>            
-            </StackPanel>
-        </Grid>
-                
-        <Grid Row="2" Margin="15,0,15,0">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <ui:CardAction x:Name="SwitchActionCard" Icon="PersonSwap24" Content="Switch to Administrator" Margin="0,0,0,10" IsEnabled="true" Click="SwitchToAdmin_Click"/>
-                    <ui:CardAction x:Name="RemoveActionCard" Icon="Recycle32" Content="Remove Bloatware" Margin="0,0,0,10" IsEnabled="true" Click="RemoveBloatware_Click"/>
-                    <ui:CardAction x:Name="InstallActionCard" Icon="ArrowDownload48" Content="Install Software" Margin="0,0,0,10" IsEnabled="true" Click="InstallActionCard_Click"/>
-                    <ui:CardAction x:Name="ConfigureActionCard" Icon="WindowSettings20" Content="Configure Windows" Margin="0,0,0,10" IsEnabled="false"/>
-                    <ui:CardAction x:Name="ReinstallActionCard" Icon="ArrowReset32" Content="Reinstall Windows" Margin="0,0,0,10" IsEnabled="false"/>
-                </StackPanel>
-            </ScrollViewer>
-        </Grid>
-
-        <Grid Grid.Row="3" Margin="15">
+        <Grid Grid.Row="2" Margin="15,0,10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="130" />
             </Grid.ColumnDefinitions>
             
             <Grid Column="1" HorizontalAlignment="Right">
@@ -62,18 +39,28 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Close" Margin="0,0,5,0" Click="Button_Click"/>
+                <Button Grid.Column="0" Content="Back" Margin="0,0,5,0" Click="Back_Click" x:Name="BackBtn" />
+                <Button Grid.Column="1" Content="Next" Margin="0,0,5,0" Click="ButtonBase_OnClick" x:Name="NextBtn"/>
             </Grid>
-
-            <StackPanel Grid.Column="0">
+            
+            <StackPanel Grid.Column="0" Margin="0,12,0,0">
                 <Label x:Name="ActionLabel" Content=""/>
-                <ProgressBar x:Name="ProgrBar" />
+                <ProgressBar x:Name="ProgrBar"/>
             </StackPanel>
         </Grid>
-        
+
         <!--  The title bar contains window navigation elements and some Tray related extras.  -->
         <!--  You can put additional controls in the header, such as a search bar.  -->
         <!--  <ui:TitleBar.Header />  -->
         <ui:TitleBar x:Name="Bar" Title="AutoInit" Icon="pack://application:,,,/AutoInit.ico" Grid.Row="0"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="40"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="1.0" HorizontalAlignment="Left" Margin="90,16,0,0" VerticalAlignment="Top" FontSize="13" x:Name="VersionString"/>
+            <TextBlock Grid.Column="1" x:Name="DebugString" Text="Debug" Margin="0,16,0,0" Foreground="Red" FontSize="13"/>
+        </Grid>
     </Grid>
 </ui:UiWindow>
