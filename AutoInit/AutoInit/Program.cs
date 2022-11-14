@@ -56,7 +56,8 @@ namespace AutoInit
                             Environment.Exit(0);
                         }
 
-                        if (args[0] == "--deployment")
+                        /* Deployment switch (not used atm)
+                        if (args[0] == "--deployment") 
                         {
                             Core.Configuration.RemoveDefaultUser = false;
                             Core.Configuration.BackgroundMusic = false;
@@ -130,6 +131,7 @@ namespace AutoInit
 
                             Environment.Exit(0);
                         }
+                        */
 
                         if (args[0] == "--update")
                         {
@@ -199,7 +201,7 @@ namespace AutoInit
                             var files = Directory.GetFiles(MusicDir, "*.mp3");
                             try
                             {
-                                playSound(files[rand.Next(files.Length)]);
+                                PlaySound(files[rand.Next(files.Length)]);
                                 Logger.Log("Playing some music.");
                             }
                             catch
@@ -286,7 +288,7 @@ namespace AutoInit
                             Console.WriteLine("[i] Downloading new version ...");
                             Logger.Log("Downloading new version...");
 
-                            // Download new version (thanks to nightly.link)
+                            // Download new version
                             WebClient wc = new();
                             wc.Headers.Add("user-agent", "AutoInit/1.0 valnoxy.dev");
                             string downloadUrl = $"https://github.com/valnoxy/AutoInit/releases/download/{latestVersion}/AutoInit_{latestVersion}.zip";
@@ -329,8 +331,7 @@ namespace AutoInit
 
             private static void CreateNewConfig()
             {
-                string config = @"
-[AutoInit]
+                string config = @"[AutoInit]
 AdminPassword = 
 
 ; Note that this user will be deleted (if not set otherwise) after the Administration switching phase.
@@ -345,7 +346,7 @@ PackageID_AcrobatReader = Adobe.Acrobat.Reader.64-bit
 InstallFirefox = true
 InstallAcrobatReader = true
 
-EnableSMB1 = true
+EnableSMB1 = false
 EnableNET35 = true
 
 RemoteMaintenance = true
@@ -398,77 +399,25 @@ DisableFastBoot = true";
                 
                 Core.Configuration.AdminPassword = ConfigIni.Read("AdminPassword", "AutoInit");
                 Core.Configuration.DefaultUsername = ConfigIni.Read("DefaultUsername", "AutoInit");
-
-                if (ConfigIni.Read("RemoveDefaultUser", "AutoInit") == "true")
-                    Core.Configuration.RemoveDefaultUser = true;
-                else
-                    Core.Configuration.RemoveDefaultUser = false;
-
-                if (ConfigIni.Read("BackgroundMusic", "AutoInit") == "true")
-                    Core.Configuration.BackgroundMusic = true;
-                else
-                    Core.Configuration.BackgroundMusic = false;
-
+                Core.Configuration.RemoveDefaultUser = ConfigIni.Read("RemoveDefaultUser", "AutoInit") == "true";
+                Core.Configuration.BackgroundMusic = ConfigIni.Read("BackgroundMusic", "AutoInit") == "true";
                 Core.Configuration.PackageID_AcrobatReader = ConfigIni.Read("PackageID_AcrobatReader", "Application");
                 Core.Configuration.PackageID_Firefox = ConfigIni.Read("PackageID_Firefox", "Application");
-
-                if (ConfigIni.Read("InstallFirefox", "Application") == "true")
-                    Core.Configuration.InstallFirefox = true;
-                else
-                    Core.Configuration.InstallFirefox = false;
-
-                if (ConfigIni.Read("InstallAcrobatReader", "Application") == "true")
-                    Core.Configuration.InstallAcrobatReader = true;
-                else
-                    Core.Configuration.InstallAcrobatReader = false;
-
-                if (ConfigIni.Read("EnableSMB1", "Application") == "true")
-                    Core.Configuration.EnableSMB1 = true;
-                else
-                    Core.Configuration.EnableSMB1 = false;
-
-                if (ConfigIni.Read("EnableNET35", "Application") == "true")
-                    Core.Configuration.EnableNET35 = true;
-                else
-                    Core.Configuration.EnableNET35 = false;
-
-                if (ConfigIni.Read("RemoteMaintenance", "Application") == "true")
-                    Core.Configuration.RemoteMaintenance = true;
-                else
-                    Core.Configuration.RemoteMaintenance = false;
-
+                Core.Configuration.InstallFirefox = ConfigIni.Read("InstallFirefox", "Application") == "true";
+                Core.Configuration.InstallAcrobatReader = ConfigIni.Read("InstallAcrobatReader", "Application") == "true";
+                Core.Configuration.EnableSMB1 = ConfigIni.Read("EnableSMB1", "Application") == "true";
+                Core.Configuration.EnableNET35 = ConfigIni.Read("EnableNET35", "Application") == "true";
+                Core.Configuration.RemoteMaintenance = ConfigIni.Read("RemoteMaintenance", "Application") == "true";
                 Core.Configuration.RemoteMaintenanceURL = ConfigIni.Read("RemoteMaintenanceURL", "Application");
                 Core.Configuration.RemoteMaintenanceFileName = ConfigIni.Read("RemoteMaintenanceFileName", "Application");
                 Core.Configuration.OtherApps = ConfigIni.Read("OtherApps", "Application");
-
-                if (ConfigIni.Read("DisableTelemetry", "Settings") == "true")
-                    Core.Configuration.DisableTelemetry = true;
-                else
-                    Core.Configuration.DisableTelemetry = false;
-
-                if (ConfigIni.Read("CheckActivation", "Settings") == "true")
-                    Core.Configuration.CheckActivation = true;
-                else
-                    Core.Configuration.CheckActivation = false;
-
+                Core.Configuration.DisableTelemetry = ConfigIni.Read("DisableTelemetry", "Settings") == "true";
+                Core.Configuration.CheckActivation = ConfigIni.Read("CheckActivation", "Settings") == "true";
                 Core.Configuration.SystemProtection = ConfigIni.Read("SystemProtection", "Settings");
-
-                if (ConfigIni.Read("DisableAutoRebootAfterBSOD", "Settings") == "true")
-                    Core.Configuration.DisableAutoRebootAfterBSOD = true;
-                else
-                    Core.Configuration.DisableAutoRebootAfterBSOD = false;
-
+                Core.Configuration.DisableAutoRebootAfterBSOD = ConfigIni.Read("DisableAutoRebootAfterBSOD", "Settings") == "true";
                 Core.Configuration.SPMaxMemoryDump = ConfigIni.Read("SPMaxMemoryDump", "Settings");
-
-                if (ConfigIni.Read("SetMaxPerformance", "Settings") == "true")
-                    Core.Configuration.SetMaxPerformance = true;
-                else
-                    Core.Configuration.SetMaxPerformance = false;
-
-                if (ConfigIni.Read("DisableFastBoot", "Settings") == "true")
-                    Core.Configuration.DisableFastBoot = true;
-                else
-                    Core.Configuration.DisableFastBoot = false;
+                Core.Configuration.SetMaxPerformance = ConfigIni.Read("SetMaxPerformance", "Settings") == "true";
+                Core.Configuration.DisableFastBoot = ConfigIni.Read("DisableFastBoot", "Settings") == "true";
 
                 Logger.Log("Config loaded.");                
                 
@@ -533,7 +482,7 @@ DisableFastBoot = true";
                 }
             }
 
-            private static void playSound(string Filepath)
+            private static void PlaySound(string Filepath)
             {
                 using var ms = File.OpenRead(Filepath);
                 using var rdr = new Mp3FileReader(ms);
@@ -561,12 +510,13 @@ DisableFastBoot = true";
 
             public static void MainMenu()
             {
-                int windows_counter = 0;
+                var windows_counter = 0;
 
                 using var writer = new HighSpeedWriter();
-                var window = new Window(writer);
-
-                window.CursorVisible = false;
+                var window = new Window(writer)
+                {
+                    CursorVisible = false
+                };
 
                 var left = window.SplitLeft();
                 var leftConsoles = left.SplitRows(
@@ -596,14 +546,13 @@ DisableFastBoot = true";
                         {
                             while (switchToAdmin && !finished)
                             {
-                                int status;
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Switch to Administrator account ...");
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Enable Administrator account ...");
                                 writer.Flush();
 
-                                status = Core.Actions.SwitchToAdmin.EnableAdmin();
+                                var adminPassword = Core.Actions.SwitchToAdmin.EnableAdmin();
                                 
-                                if (status != 0)
+                                if (adminPassword != 0)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot enable Administrator account!");
                                     writer.Flush();
@@ -615,9 +564,9 @@ DisableFastBoot = true";
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Change Administrator password ...");
                                 writer.Flush();
 
-                                status = Core.Actions.SwitchToAdmin.UpdateAdminPassword(Core.Configuration.AdminPassword);
+                                adminPassword = Core.Actions.SwitchToAdmin.UpdateAdminPassword(Core.Configuration.AdminPassword);
 
-                                if (status != 0)
+                                if (adminPassword != 0)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot change password from Administrator account!");
                                     writer.Flush();
@@ -630,9 +579,9 @@ DisableFastBoot = true";
                                     statusCon.WriteLine(ConsoleColor.Yellow, "    -> Remove User account ...");
                                     writer.Flush();
 
-                                    status = Core.Actions.SwitchToAdmin.RemoveUser(Core.Configuration.DefaultUsername);
+                                    adminPassword = Core.Actions.SwitchToAdmin.RemoveUser(Core.Configuration.DefaultUsername);
 
-                                    if (status != 0)
+                                    if (adminPassword != 0)
                                     {
                                         statusCon.WriteLine(ConsoleColor.Red, $"[!] Cannot delete account '{Core.Configuration.DefaultUsername}'!");
                                         writer.Flush();
@@ -651,69 +600,69 @@ DisableFastBoot = true";
                             while (removeBloadware && !finished)
                             {
                                 statusCon.WriteLine(ConsoleColor.Cyan, "[i] Remove Bloatware ...");
-                                int statuscode;
 
                                 // ---------------------------------------------------------------------------
                                 statusCon.WriteLine(ConsoleColor.Yellow, "    -> Removing App Connector ...");
                                 writer.Flush();
-                                statuscode = AppxRemove.RemoveAppx("Microsoft.Appconnector");
-                                if (statuscode != 0)
+                                var statusCode = AppxRemove.RemoveAppx("Microsoft.Appconnector");
+                                if (statusCode != 0)
                                     statusCon.WriteLine(ConsoleColor.Red, "[!] App cannot be removed!");
 
                                 // Initialize list of apps to remove
                                 Core.Actions.AppxManagement.apps = new List<Core.Actions.AppxManagement.App>();
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "3D Builder", ID = "Microsoft.3DBuilder" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "3D Viewer", ID = "Microsoft.Microsoft3DViewer" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "App Connector", ID = "Microsoft.Appconnector" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Candy Crush Saga", ID = "king.com.CandyCrushSaga" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Candy Crush Soda Saga", ID = "king.com.CandyCrushSodaSaga" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Code Writer", ID = "ActiproSoftwareLLC.562882FEEB491" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Communications - Phone app", ID = "Microsoft.CommsPhone" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Cortana", ID = "Microsoft.549981C3F5F10" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Duolingo", ID = "D5EA27B7.Duolingo-LearnLanguagesforFree" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Eclipse Manager", ID = "46928bounde.EclipseManager" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Flipboard", ID = "Flipboard.Flipboard" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Get Help", ID = "Microsoft.GetHelp" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Tips app", ID = "Microsoft.Getstarted" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "GroupMe", ID = "Microsoft.GroupMe10" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "iHeartRadio", ID = "ClearChannelRadioDigital.iHeartRadio" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Messaging", ID = "Microsoft.Messaging" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Microsoft Office OneNote", ID = "Microsoft.Office.OneNote" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Microsoft Solitaire Collection", ID = "Microsoft.MicrosoftSolitaireCollection" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Minecraft for Windows 10 Edition", ID = "Microsoft.MinecraftUWP" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Mixed Reality Portal", ID = "Microsoft.MixedReality.Portal" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Mobile Plans", ID = "Microsoft.OneConnect" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Finance", ID = "Microsoft.BingFinance" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN News", ID = "Microsoft.BingNews" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Sports", ID = "Microsoft.BingSports" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Weather", ID = "Microsoft.BingWeather" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "My Office", ID = "Microsoft.MicrosoftOfficeHub" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Network Speedtest", ID = "Microsoft.NetworkSpeedTest" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Pandora", ID = "PandoraMediaInc.29680B314EFC2" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "People", ID = "Microsoft.People" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Photoshop Express", ID = "AdobeSystemIncorporated.AdobePhotoshop" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Print3D", ID = "Microsoft.Print3D" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Remote Desktop app", ID = "Microsoft.RemoteDesktop" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Shazam", ID = "ShazamEntertainmentLtd.Shazam" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Spotify", ID = "SpotifyAB.SpotifyMusic" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Sticky Notes", ID = "Microsoft.MicrosoftStickyNotes" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Sway", ID = "Microsoft.Office.Sway" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Tips app", ID = "Microsoft.Getstarted" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "To Do app", ID = "Microsoft.Todos" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Twitter", ID = "9E2F88E3.Twitter" });
+                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Voice Recorder", ID = "Microsoft.WindowsSoundRecorder" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Feedback Hub", ID = "Microsoft.WindowsFeedbackHub" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Alarms", ID = "Microsoft.WindowsAlarms" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Camera", ID = "Microsoft.WindowsCamera" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Windows Maps", ID = "Microsoft.WindowsMaps" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Minecraft for Windows 10 Edition", ID = "Microsoft.MinecraftUWP" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "People", ID = "Microsoft.People" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Print3D", ID = "Microsoft.Print3D" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Mobile Plans", ID = "Microsoft.OneConnect" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Microsoft Solitaire Collection", ID = "Microsoft.MicrosoftSolitaireCollection" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Sticky Notes", ID = "Microsoft.MicrosoftStickyNotes" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "GroupMe", ID = "Microsoft.GroupMe10" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Voice Recorder", ID = "Microsoft.WindowsSoundRecorder" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "3D Builder", ID = "Microsoft.3DBuilder" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "3D Viewer", ID = "Microsoft.Microsoft3DViewer" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Weather", ID = "Microsoft.BingWeather" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Sports", ID = "Microsoft.BingSports" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN News", ID = "Microsoft.BingNews" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "MSN Finance", ID = "Microsoft.BingFinance" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "My Office", ID = "Microsoft.MicrosoftOfficeHub" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Microsoft Office OneNote", ID = "Microsoft.Office.OneNote" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Sway", ID = "Microsoft.Office.Sway" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox App", ID = "Microsoft.XboxApp" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Live in-game experience", ID = "Microsoft.Xbox.TCUI" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Game Bar", ID = "Microsoft.XboxGamingOverlay" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Game Bar Plugin", ID = "Microsoft.XboxGameOverlay" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Identity Provider", ID = "Microsoft.XboxIdentityProvider" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Xbox Speech to Text Overlay", ID = "Microsoft.XboxSpeechToTextOverlay" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Network Speedtest", ID = "Microsoft.NetworkSpeedTest" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "To Do app", ID = "Microsoft.Todos" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Shazam", ID = "ShazamEntertainmentLtd.Shazam" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Candy Crush Saga", ID = "king.com.CandyCrushSaga" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Candy Crush Soda Saga", ID = "king.com.CandyCrushSodaSaga" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Flipboard", ID = "Flipboard.Flipboard" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Twitter", ID = "9E2F88E3.Twitter" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "iHeartRadio", ID = "ClearChannelRadioDigital.iHeartRadio" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Duolingo", ID = "D5EA27B7.Duolingo-LearnLanguagesforFree" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Photoshop Express", ID = "AdobeSystemIncorporated.AdobePhotoshop" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Pandora", ID = "PandoraMediaInc.29680B314EFC2" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Eclipse Manager", ID = "46928bounde.EclipseManager" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Code Writer", ID = "ActiproSoftwareLLC.562882FEEB491" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Spotify", ID = "SpotifyAB.SpotifyMusic" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Your Phone Companion #1", ID = "Microsoft.WindowsPhone" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Your Phone Companion #2", ID = "Microsoft.Windows.Phon" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Communications - Phone app", ID = "Microsoft.CommsPhone" });
                                 Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Your Phone", ID = "Microsoft.YourPhone" });
-                                Core.Actions.AppxManagement.apps.Add(new Core.Actions.AppxManagement.App { Name = "Remote Desktop app", ID = "Microsoft.RemoteDesktop" });
+
 
                                 int progress = 0;
                                 foreach (var app in Core.Actions.AppxManagement.apps)
@@ -721,9 +670,9 @@ DisableFastBoot = true";
                                     progress++;
                                     statusCon.WriteLine(ConsoleColor.Yellow, $"   -> Removing {app.Name} ...");
 
-                                    statuscode = Core.Actions.AppxManagement.RemoveAppx(app.ID);
+                                    statusCode = Core.Actions.AppxManagement.RemoveAppx(app.ID);
 
-                                    if (statuscode != 0) statusCon.WriteLine(ConsoleColor.Red, $"   -> Cannot remove {app.Name}! Error: {statuscode}");
+                                    if (statusCode != 0) statusCon.WriteLine(ConsoleColor.Red, $"   -> Cannot remove {app.Name}! Error: {statusCode}");
                                 }
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Bloatware removed!");

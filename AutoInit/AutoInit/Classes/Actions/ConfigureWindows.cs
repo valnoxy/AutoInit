@@ -27,13 +27,10 @@ namespace AutoInit
             // Disable CEIP
             bool CEIP = true;
             int a = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator\" /DISABLE");
-            if (a != 0) CEIP = false;
 
             int b = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\KernelCeipTask\" /DISABLE");
-            if (b != 0) CEIP = false;
             
             int c = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip\" /DISABLE");
-            if (c != 0) CEIP = false;
 
             return CEIP;
         }
@@ -155,12 +152,11 @@ namespace AutoInit
         #region Modules
         private static bool SetRegkey(string path, string name, string value)
         {
-            RegistryKey parentKey = Registry.LocalMachine;
-            RegistryKey subKey = parentKey.OpenSubKey(path, true);
-
             try
             {
-                subKey.SetValue(name, value);
+                RegistryKey localMachine = RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, RegistryView.Registry64);
+                var reg = localMachine.OpenSubKey(path, true) ?? localMachine.CreateSubKey(path);
+                reg.SetValue(name, value);
             }
             catch { return false; }
             return true;
