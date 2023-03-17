@@ -892,10 +892,12 @@ DisableFastBoot = true";
                                 }
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Update registry ...");
-                                Classes.Actions.Registry.SetReg(@"SYSTEM\Setup\SetupType", RegistryValueKind.DWord, 1);
-                                Classes.Actions.Registry.SetReg(@"SYSTEM\Setup\CmdLine", RegistryValueKind.String, "%SYSTEMDRIVE%\\AutoInit\\Boot\\AutoInit.Boot.exe");
+                                writer.Flush();
+                                Classes.Actions.Registry.SetReg(@"SYSTEM\Setup", "SetupType", RegistryValueKind.DWord, 1);
+                                Classes.Actions.Registry.SetReg(@"SYSTEM\Setup", "CmdLine", RegistryValueKind.String, "%SYSTEMDRIVE%\\AutoInit\\Boot\\AutoInit.Boot.exe");
 
                                 statusCon.WriteLine(ConsoleColor.Green, "[i] Rebooting into Pwned Boot Mode ...");
+                                writer.Flush();
                                 var psi = new ProcessStartInfo("shutdown", "/r /t 0");
                                 psi.CreateNoWindow = true;
                                 psi.UseShellExecute = false;

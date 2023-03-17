@@ -6,15 +6,16 @@ namespace AutoInit.Classes.Actions
 {
     internal class Registry
     {
-        public static void SetReg(string keyPath, RegistryValueKind valueKind, object valueData)
+        public static void SetReg(string keyPath, string keyName, RegistryValueKind valueKind, object valueData)
         {
-            RegistryKey? regKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(keyPath, true);
+            var regKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(keyPath, true);
 
             if (regKey != null)
             {
                 try
                 {
-                    regKey.SetValue(Path.GetFileName(keyPath), valueData, valueKind);
+                    Logger.Log("Setting value ...");
+                    regKey.SetValue(keyName, valueData, valueKind);
                 }
                 catch (Exception ex)
                 {
@@ -25,6 +26,8 @@ namespace AutoInit.Classes.Actions
                     regKey.Close();
                 }
             }
+            else
+                Logger.Log("Error setting the registry key: regKey is null");
         }
     }
 }
