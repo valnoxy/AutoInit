@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Management.Automation;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-
-namespace AutoInit.Core.Actions
+namespace AutoInit.Boot.Common
 {
     public class AppxManagement
     {
@@ -26,35 +24,31 @@ namespace AutoInit.Core.Actions
         /// <remarks>
         /// Return code: 0 = success, 1 = failure
         /// </remarks>
-        /// <param name="appID">Application ID</param>
+        /// <param name="appId">Application ID</param>
         /// <returns>Status code</returns>
-        public static int RemoveAppx(string appID)
+        public static int RemoveAppXProvisionedPackage(string appId)
         {
-            var psi = new ProcessStartInfo
-            {
-                UseShellExecute = true,
-                CreateNoWindow = false,
-                Arguments = $"Get-AppxPackage '{appID}' | Remove-AppxPackage",
-                WindowStyle = ProcessWindowStyle.Hidden,
-                FileName = "powershell.exe"
-            };
+            var psi = new ProcessStartInfo();
+            psi.UseShellExecute = true;
+            psi.CreateNoWindow = false;
+            psi.Arguments = $"$App = Get-AppXProvisionedPackage -Online | Where {{$_.DisplayName -eq '{appId}' }}; Remove-AppXProvisionedPackage -Online -PackageName $App.PackageName";
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            psi.FileName = "powershell.exe";
             var proc = Process.Start(psi);
 
-            proc?.WaitForExit();
-            return proc!.ExitCode;
+            proc.WaitForExit();
+            return proc.ExitCode;
         }
 
         /// <summary>
         /// Checks if WinGet is installed on the system.
         /// </summary>
         /// <returns>Summary as bool</returns>
-        public static bool IsWinGetInstalled()
+        public static bool IsWingetInstalled()
         {
-            var p = new Process();
+            Process p = new Process();
             p.StartInfo.FileName = "cmd.exe";
             p.StartInfo.Arguments = "/c winget";
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
             p.Start();
             p.WaitForExit();
 
@@ -62,13 +56,13 @@ namespace AutoInit.Core.Actions
         }
 
         /// <summary>
-        /// Installs the app to the system via WinGet.
+        /// Installs the App to the system via WinGet.
         /// </summary>
         /// <param name="PackageName"></param>
         /// <returns>Status code</returns>
         public static int InstallApp(string PackageName)
         {
-            var p = new Process();
+            Process p = new Process();
             p.StartInfo.FileName = "cmd.exe";
             p.StartInfo.Arguments = $"/c winget install --id {PackageName} --accept-source-agreements --accept-package-agreements";
             p.StartInfo.UseShellExecute = false;
@@ -82,15 +76,15 @@ namespace AutoInit.Core.Actions
         /// <summary>
         /// Download the desired file from the internet.
         /// </summary>
-        /// <param name="downloadUrl"></param>
-        /// <param name="saveTo"></param>
+        /// <param name="DownloadURL"></param>
+        /// <param name="SaveTo"></param>
         /// <returns>Status code</returns>
-        public static int InstallRemoteManagement(string downloadUrl, string saveTo)
+        public static int InstallRM(string DownloadURL, string SaveTo)
         {
             try
             {
                 WebClient rms = new();
-                rms.DownloadFile(downloadUrl, saveTo);
+                rms.DownloadFile(DownloadURL, SaveTo);
                 return 0;
             }
             catch
@@ -100,15 +94,15 @@ namespace AutoInit.Core.Actions
         }
 
         /// <summary>
-        /// Installs the desired feature on the system.
+        /// Installs the desired Feature on the system.
         /// </summary>
-        /// <param name="featureName"></param>
+        /// <param name="FeatureName"></param>
         /// <returns></returns>
-        public static int InstallFeature(string featureName)
+        public static int InstallFeature(string FeatureName)
         {
-            var p = new Process();
+            Process p = new Process();
             p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.Arguments = $"/c \"dism /Online /Enable-Feature /All /FeatureName:{featureName} /NoRestart\"";
+            p.StartInfo.Arguments = $"/c \"dism /Online /Enable-Feature /All /FeatureName:{FeatureName} /NoRestart\"";
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.Start();

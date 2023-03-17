@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoInit.Core;
+using Microsoft.Win32;
 
 namespace AutoInit
 {
@@ -152,16 +153,21 @@ namespace AutoInit
                 Logger.StartLogging();
 
                 // Set Git version
-                using (Stream stream = Assembly.GetExecutingAssembly()
+                /* 
+                (Stream stream = Assembly.GetExecutingAssembly()
                         .GetManifestResourceStream("AutoInit." + "version.txt"))
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     gitVersion = reader.ReadLine();
                 }
                 Console.Title = "AutoInit [Build: " + gitVersion + "]";
+                */
+                var appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                var appVer = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build + "." + appVersion.Revision;
+                Console.Title = $"AutoInit [Version {appVer}]";
 
                 // Check for updates
-                CheckForUpdates();
+                //CheckForUpdates();
 
                 // Verify the existance of the config file
                 if (!File.Exists(Core.Configuration.ConfigurationFile))
@@ -691,7 +697,7 @@ DisableFastBoot = true";
                                 int status;
 
                                 // Check if winget is installed on the device
-                                bool isWingetInstalled = Core.Actions.AppxManagement.IsWingetInstalled();
+                                bool isWingetInstalled = Core.Actions.AppxManagement.IsWinGetInstalled();
                                 if (!isWingetInstalled)
                                 {
                                     statusCon.WriteLine(ConsoleColor.Red, "[!] Error: Winget not found. Please update App Installer!");
@@ -768,7 +774,7 @@ DisableFastBoot = true";
                                     string rmsFn = Path.Combine(publicDesktop, Core.Configuration.RemoteMaintenanceFileName);
                                     Logger.Log("Remote maintenance software downloaded.");
                                     
-                                    status = Core.Actions.AppxManagement.InstallRM(Core.Configuration.RemoteMaintenanceURL, rmsFn);
+                                    status = Core.Actions.AppxManagement.InstallRemoteManagement(Core.Configuration.RemoteMaintenanceURL, rmsFn);
 
                                     if (status != 0) 
                                     {
@@ -851,10 +857,51 @@ DisableFastBoot = true";
                         {
                             while (configureWindows && !finished)
                             {
-                                Logger.Log("User requested to configure Windows.");
+                                Logger.Log("User requested to initialize post-configuration.");
 
-                                statusCon.WriteLine(ConsoleColor.Cyan, "[i] Configure Windows Installation ...");
+                                statusCon.WriteLine(ConsoleColor.Cyan, "[i] Perform Post-Configuration ...");
+                                writer.Flush();
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Cloning to System disk ...");
+                                writer.Flush();
 
+                                try
+                                {
+                                    var clonePath = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory),
+                                        "AutoInit");
+                                    var thisPath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
+
+                                    if (Path.Exists(clonePath))
+                                    {
+                                        Directory.Delete(clonePath, true);
+                                    }
+
+                                    Logger.Log("clonePath value is: " + clonePath);
+                                    Logger.Log("thisPath value is: " + thisPath);
+
+                                    Directory.CreateDirectory(clonePath);
+                                    ConfigureWindows.CopyFilesRecursively(thisPath, clonePath);
+                                    writer.Flush();
+                                }
+                                catch (Exception ex)
+                                {
+                                    statusCon.WriteLine(ConsoleColor.Red, $"[!] Failed to prepare post-configuration: {ex.Message}");
+                                    Logger.Log("Exception at configureWindows: " + ex);
+                                    writer.Flush();
+                                    configureWindows = false;
+                                    break;
+                                }
+
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Update registry ...");
+                                Classes.Actions.Registry.SetReg(@"SYSTEM\Setup\SetupType", RegistryValueKind.DWord, 1);
+                                Classes.Actions.Registry.SetReg(@"SYSTEM\Setup\CmdLine", RegistryValueKind.String, "%SYSTEMDRIVE%\\AutoInit\\Boot\\AutoInit.Boot.exe");
+
+                                statusCon.WriteLine(ConsoleColor.Green, "[i] Rebooting into Pwned Boot Mode ...");
+                                var psi = new ProcessStartInfo("shutdown", "/r /t 0");
+                                psi.CreateNoWindow = true;
+                                psi.UseShellExecute = false;
+                                Process.Start(psi);
+
+                                /*
                                 #region Telemetry
                                 if (Core.Configuration.DisableTelemetry)
                                 {
@@ -1041,8 +1088,10 @@ DisableFastBoot = true";
                                     }
                                 }
                                 #endregion
+                                */
 
                                 writer.Flush();
+                                configureWindows = false;
                             }
                         }
                         else
@@ -1104,7 +1153,7 @@ DisableFastBoot = true";
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
                         status.WriteLine(ConsoleColor.Red, $" Install Applications ");
                     }),
-                    new MenuItem('c', "Configure Windows (WIP - not working)", () =>
+                    new MenuItem('p', "Post Configuration (PwnBoot - Reboot required)", () =>
                     {
                         switchToAdmin = false;
                         removeBloadware = false;
@@ -1112,7 +1161,7 @@ DisableFastBoot = true";
                         configureWindows = true;
                         reinstallWindows = false;
                         status.Write(ConsoleColor.White, $"{Environment.UserName} : {DateTime.Now.ToString("HH:mm:ss -")}");
-                        status.WriteLine(ConsoleColor.Red, $" Configure Windows ");
+                        status.WriteLine(ConsoleColor.Red, $" Post Configuration via PwnBoot ");
                     }),
                     new MenuItem('W', "Reinstall Windows (WIP - not working)", () =>
                     {

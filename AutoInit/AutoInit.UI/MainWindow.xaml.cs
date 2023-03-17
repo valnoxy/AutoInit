@@ -229,7 +229,7 @@ namespace AutoInit.UI
             int status;
 
             // Check if winget is installed on the device
-            bool isWingetInstalled = Core.Actions.AppxManagement.IsWingetInstalled();
+            bool isWingetInstalled = Core.Actions.AppxManagement.IsWinGetInstalled();
             if (!isWingetInstalled)
             {
                 ReportAction("Error: Winget not found. Please update App Installer!");
@@ -265,7 +265,7 @@ namespace AutoInit.UI
             ReportAction("Installing Remote Maintenance Tool ...");
             string publicDesktop = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
             string rmsFn = Path.Combine(publicDesktop, "Fernwartung Wolkenhof.exe");
-            status = Core.Actions.AppxManagement.InstallRM("https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe", rmsFn);
+            status = Core.Actions.AppxManagement.InstallRemoteManagement("https://wolkenhof.com/download/Fernwartung_Wolkenhof.exe", rmsFn);
             if (status != 0)
             {
                 ReportAction($"Cannot install Remote Maintenance Tool. Error: {status}");

@@ -18,7 +18,7 @@ namespace AutoInit.Core.Actions
         /// <returns>Exitcode</returns>
         public static int EnableAdmin()
         {
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = "cmd.exe";
             p.StartInfo.Arguments = "/c \"net user Administrator /active:yes\"";
             p.StartInfo.UseShellExecute = false;
@@ -37,7 +37,7 @@ namespace AutoInit.Core.Actions
         /// <returns>Exitcode</returns>
         public static int UpdateAdminPassword(string password)
         {
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = "cmd.exe";
             p.StartInfo.Arguments = $"/c \"net user Administrator {password}\"";
             p.StartInfo.UseShellExecute = false;
@@ -56,7 +56,7 @@ namespace AutoInit.Core.Actions
         /// <returns>Exitcode</returns>
         public static int RemoveUser(string username)
         {
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = "cmd.exe";
             p.StartInfo.Arguments = $"/c \"net user {username} /delete\"";
             p.StartInfo.UseShellExecute = false;

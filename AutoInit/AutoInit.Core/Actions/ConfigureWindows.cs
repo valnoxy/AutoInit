@@ -10,28 +10,28 @@ namespace AutoInit.Core
         public static bool DisableCEI()
         {
             // CEIP/SQM
-            bool CEIP = SetRegkey("Software\\Policies\\Microsoft\\SQMClient\\Windows", "CEIPEnable", "0");
+            var CEIP = SetRegkey("Software\\Policies\\Microsoft\\SQMClient\\Windows", "CEIPEnable", "0");
             return CEIP;
         }
 
         public static bool DisableAIT()
         {
             // Disable AIT
-            bool CEIP = SetRegkey("Software\\Policies\\Microsoft\\Windows\\AppCompat", "AITEnable", "0");
-            return CEIP;
+            var AIT = SetRegkey("Software\\Policies\\Microsoft\\Windows\\AppCompat", "AITEnable", "0");
+            return AIT;
         }
 
         public static bool DisableCEIP()
         {
             // Disable CEIP
-            bool CEIP = true;
-            int a = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator\" /DISABLE");
+            var CEIP = true;
+            var a = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator\" /DISABLE");
             if (a != 0) CEIP = false;
 
-            int b = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\KernelCeipTask\" /DISABLE");
+            var b = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\KernelCeipTask\" /DISABLE");
             if (b != 0) CEIP = false;
             
-            int c = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip\" /DISABLE");
+            var c = RunProcess("schtasks.exe", "/change /TN \"\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip\" /DISABLE");
             if (c != 0) CEIP = false;
 
             return CEIP;
@@ -40,20 +40,20 @@ namespace AutoInit.Core
         public static bool DisableDCP()
         {
             // Disable DCP
-            bool DCP = true;
-            bool a = SetRegkey("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", "0");
+            var DCP = true;
+            var a = SetRegkey("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", "0");
             if (a == false) DCP = false;
 
-            bool b = SetRegkey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", "0");
+            var b = SetRegkey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", "0");
             if (b == false) DCP = false;
 
-            bool c = SetRegkey("SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "AllowTelemetry", "0");
+            var c = SetRegkey("SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "AllowTelemetry", "0");
             if (c == false) DCP = false;
 
-            bool d = SetRegkey("SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "LimitEnhancedDiagnosticDataWindowsAnalytics", "0");
+            var d = SetRegkey("SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "LimitEnhancedDiagnosticDataWindowsAnalytics", "0");
             if (d == false) DCP = false;
 
-            bool e = SetRegkey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", "0");
+            var e = SetRegkey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "AllowTelemetry", "0");
             if (e == false) DCP = false;
 
             return DCP;
@@ -62,8 +62,8 @@ namespace AutoInit.Core
         public static bool DisableLicenseTel()
         {
             // Disable LT
-            bool DCP = true;
-            bool a = SetRegkey("Software\\Policies\\Microsoft\\Windows NT\\CurrentVersion\\Software Protection Platform", "NoGenTicket", "1");
+            var DCP = true;
+            var a = SetRegkey("Software\\Policies\\Microsoft\\Windows NT\\CurrentVersion\\Software Protection Platform", "NoGenTicket", "1");
             if (a == false) DCP = false;
 
             return DCP;
@@ -72,8 +72,8 @@ namespace AutoInit.Core
         public static bool DisableDeviceSensus()
         {
             // Disable LT
-            bool status = true;
-            int a = RunProcess("schtasks.exe", "/change /TN \"Microsoft\\Windows\\Device Information\\Device\" /disable");
+            var status = true;
+            var a = RunProcess("schtasks.exe", "/change /TN \"Microsoft\\Windows\\Device Information\\Device\" /disable");
             if (a != 0) status = false;
 
             return status;
@@ -83,26 +83,21 @@ namespace AutoInit.Core
         #region System check
         public static bool IsWindowsActivated()
         {
-            ManagementScope scope = new ManagementScope(@"\\" + System.Environment.MachineName + @"\root\cimv2");
+            var scope = new ManagementScope(@"\\" + System.Environment.MachineName + @"\root\cimv2");
             scope.Connect();
 
-            SelectQuery searchQuery = new SelectQuery("SELECT * FROM SoftwareLicensingProduct WHERE ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f' and LicenseStatus = 1");
-            ManagementObjectSearcher searcherObj = new ManagementObjectSearcher(scope, searchQuery);
+            var searchQuery = new SelectQuery("SELECT * FROM SoftwareLicensingProduct WHERE ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f' and LicenseStatus = 1");
+            var searcherObj = new ManagementObjectSearcher(scope, searchQuery);
 
-            using (ManagementObjectCollection obj = searcherObj.Get())
-            {
-                return obj.Count > 0;
-            }
+            var obj = searcherObj.Get();
+            return obj.Count > 0;
         }
         #endregion
 
         #region Tweaks
         public static bool DisableAutoRebootOnBSOD()
         {
-            bool status = true;
-            bool a = SetRegkey("SYSTEM\\CurrentControlSet\\Control\\CrashControl", "AutoReboot","0");
-            if (a == false) status = false;
-            return status;
+            return SetRegkey("SYSTEM\\CurrentControlSet\\Control\\CrashControl", "AutoReboot","0");
         }
 
         public static bool SetMaxMemDump(string SPMaxMemoryDump)

@@ -8,7 +8,7 @@
 		<PackageId>AutoInit UI</PackageId>
 		<Authors>valnoxy</Authors>
 		<Product>AutoInit</Product>
-		<Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
 		<ApplicationIcon>AutoInit.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>AnyCPU;ARM64;x64</Platforms>

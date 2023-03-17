@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace AutoInit.Core
 {
+    [Obsolete("Will be replaced with AutoDive soon")]
     internal class ReinstallWindows
     {
         public static int WriteIniFile()
@@ -25,7 +26,7 @@ namespace AutoInit.Core
             iniFile.Write("General", "Image", winver);
             iniFile.Write("General", "Disk", "0");
 
-            bool IsUEFI = IsWindowsUEFI();
+            var IsUEFI = IsWindowsUEFI();
             if (IsUEFI)
                 iniFile.Write("General", "Firmware", "EFI");
             if (!IsUEFI)

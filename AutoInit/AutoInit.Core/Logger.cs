@@ -6,32 +6,32 @@ namespace AutoInit.Core
     {
         private static string logFile;
 
-        public static string StartLogging(string Interface, string InterfaceVersion)
+        public static string StartLogging(string @interface, string interfaceVersion)
         {
             // Initialize logging
-            DateTime today = DateTime.Now;
-            string currentDate = today.ToString("dd.MM.yyyy");
-            string currentTime = today.ToString("HHmm");
-            string currentTimeWS = today.ToString("HH:mm");
-            Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            string appver = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build + "." + appVersion.Revision;
+            var today = DateTime.Now;
+            var currentDate = today.ToString("dd.MM.yyyy");
+            var currentTime = today.ToString("HHmm");
+            var currentTimeWs = today.ToString("HH:mm");
+            var appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            var appver = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build + "." + appVersion.Revision;
 
-            string logPath = Path.Combine(AppContext.BaseDirectory, "logs");
-            string logName = $"AutoInit_{Interface}_{currentDate}_{currentTime}.log";
+            var logPath = Path.Combine(AppContext.BaseDirectory, "logs");
+            var logName = $"AutoInit_{@interface}_{currentDate}_{currentTime}.log";
             logFile = Path.Combine(logPath, logName);
 
             if (!Directory.Exists(logPath))
                 Directory.CreateDirectory(logPath);
 
-            using (StreamWriter streamWriter = new StreamWriter(logFile))
+            using (var streamWriter = new StreamWriter(logFile))
             {
-                string introMsg =
-@$"AutoInit started at {currentDate} {currentTimeWS}
+                var introMsg =
+@$"AutoInit started at {currentDate} {currentTimeWs}
 Log file: {logFile}
 ===========================================================
 
 Core Version: {appver}
-AutoInit {Interface} Version: {InterfaceVersion}
+AutoInit {@interface} Version: {interfaceVersion}
 Windows Version: {Environment.OSVersion}
 
 ===========================================================";
@@ -48,28 +48,14 @@ Windows Version: {Environment.OSVersion}
 
             TextWriter tW = new StreamWriter(logFile, true);
             {
-                DateTime today = DateTime.UtcNow;
-                string currentDate = today.ToString("dd.MM.yyyy");
-                string currentTimeWS = today.ToString("HH:mm");
+                var today = DateTime.UtcNow;
+                var currentDate = today.ToString("dd.MM.yyyy");
+                var currentTimeWs = today.ToString("HH:mm");
 
-                string msg = $"[{currentDate} {currentTimeWS}] {message}";
+                var msg = $"[{currentDate} {currentTimeWs}] {message}";
                 tW.WriteLine(msg);
                 tW.Close();
             }
-        }
-
-        public static string? GetGitHash()
-        {
-            string gitVersion = String.Empty;
-            using Stream? stream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("AutoInit." + "version.txt");
-            if (stream != null)
-            {
-                using StreamReader reader = new StreamReader(stream);
-                gitVersion = reader.ReadLine();
-            }
-
-            return gitVersion;
         }
     }
 }

@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net7.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<PackageId>AutoInit Boot</PackageId>
+		<Authors>valnoxy</Authors>
+		<Product>AutoInit</Product>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
+		<ApplicationIcon>AutoInit.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>AnyCPU;ARM64;x64</Platforms>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<Version>1.2.0</Version>
+		<AssemblyVersion>1.2.0</AssemblyVersion>
+		<FileVersion>1.2.0</FileVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Fadi_Loop_f.gif" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Fadi_Loop_f.gif" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
+		<PackageReference Include="XamlAnimatedGif" Version="2.1.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\AutoInit.Core\AutoInit.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Resources\StartMenu.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>StartMenu.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\StartMenu.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>StartMenu.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>
