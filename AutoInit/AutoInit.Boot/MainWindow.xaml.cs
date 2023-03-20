@@ -4,6 +4,7 @@ using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -197,6 +198,92 @@ namespace AutoInit.Boot
                 }
                 Environment.Exit(0);
             }
+
+            // System Protection enabled + 20%
+            // Show File Extension
+            // Energy Option: Höchstleistung
+            //                Fast Boot disabled
+
+            #region Disable Auto Restar on BSoD
+
+            worker?.ReportProgress(40, "Deaktivierung des automatischen Neustarts beim BSoD");
+            try
+            {
+                var p = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/c \"wmic RecoverOS set AutoReboot = False\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = false,
+                        CreateNoWindow = true
+                    }
+                };
+                p.Start();
+                p.WaitForExit();
+
+                if (p.ExitCode != 0)
+                    Core.Logger.Log("Failed to disable Auto Reboot on BSoD: " + p.ExitCode);
+
+                worker?.ReportProgress(50, $"Anpassen der maximalen Speicherplatzbelegung auf C:\\");
+                var p1 = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/c \"vssadmin resize shadowstorage /for=C: /on=C: /maxsize=20%\r\n\r\n\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = false,
+                        CreateNoWindow = true
+                    }
+                };
+                p1.Start();
+                p1.WaitForExit();
+
+                if (p1.ExitCode != 0)
+                    Core.Logger.Log("Failed to disable Auto Reboot on BSoD: " + p1.ExitCode);
+            }
+            catch (Exception ex)
+            {
+                Core.Logger.Log("Failed to disable Auto Reboot on BSoD: " + ex.Message);
+            }
+
+            #endregion
+
+            #region System Protection enabled + 20%
+
+            worker?.ReportProgress(60, $"Aktivierung des Computerschutz auf Datenträger C:\\");
+            var psi = new ProcessStartInfo
+            {
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                Arguments = $"Enable-ComputerRestore -Drive \"C:\\\"",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                FileName = "powershell.exe"
+            };
+            var proc = Process.Start(psi);
+            proc?.WaitForExit();
+
+            worker?.ReportProgress(70, $"Anpassen der maximalen Speicherplatzbelegung auf C:\\");
+            var p2 = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c \"vssadmin resize shadowstorage /for=C: /on=C: /maxsize=20%\r\n\r\n\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = false,
+                    CreateNoWindow = true
+                }
+            };
+            p2.Start();
+            p2.WaitForExit();
+
+            if (p2.ExitCode != 0)
+                Core.Logger.Log("Failed to disable Auto Reboot on BSoD: " + p2.ExitCode);
+
+            #endregion
         }
     }
 }
