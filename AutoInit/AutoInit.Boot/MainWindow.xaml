@@ -22,11 +22,11 @@
 
         <StackPanel Grid.Row="0" Margin="0,0,0,-30"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom" >
+                    VerticalAlignment="Bottom">
 
             <Grid>
                 <ui:ProgressRing x:Name="ProgressRing" IsActive="True" Height="50" Width="50" Margin="0,100,0,15" Foreground="White"/>
-                <Image Visibility="Hidden" Height="150" Margin="70,0,0,0" Name="EasterEgg" gif:AnimationBehavior.SourceUri="pack://application:,,,/Fadi_Loop_f.gif"/>
+                <Image Visibility="Hidden" Height="150" Margin="70,0,0,0" Name="EasterEgg"/>
             </Grid>
 
             <TextBlock  

@@ -19,10 +19,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Fadi2.gif" />
 		<None Remove="Fadi_Loop_f.gif" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Fadi2.gif" />
 		<Resource Include="Fadi_Loop_f.gif" />
 	</ItemGroup>
 

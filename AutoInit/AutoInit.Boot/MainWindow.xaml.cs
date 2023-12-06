@@ -11,6 +11,8 @@ using System.Windows;
 using System.Windows.Input;
 using AutoInit.Boot.Resources;
 using Path = System.IO.Path;
+using System.Security.Policy;
+using XamlAnimatedGif;
 
 namespace AutoInit.Boot
 {
@@ -35,7 +37,7 @@ namespace AutoInit.Boot
             _applyBackgroundWorker = new BackgroundWorker();
             _applyBackgroundWorker.WorkerReportsProgress = true;
             _applyBackgroundWorker.WorkerSupportsCancellation = true;
-            _applyBackgroundWorker.DoWork += CounterProgr;
+            //_applyBackgroundWorker.DoWork += CounterProgr;
             _applyBackgroundWorker.ProgressChanged += applyBackgroundWorker_ProgressChanged;
             _applyBackgroundWorker.RunWorkerAsync();
         }
@@ -47,6 +49,15 @@ namespace AutoInit.Boot
             if (Keyboard.Modifiers != ModifierKeys.Control || e.Key != Key.F) return;
             if (!_easterEggIsEnabled)
             {
+                // Define gif
+                var random = new Random();
+                var randomValue = random.Next(1, 11);
+
+                AnimationBehavior.SetSourceUri(EasterEgg,
+                    randomValue == 1
+                        ? new Uri("pack://application:,,,/Fadi2.gif")
+                        : new Uri("pack://application:,,,/Fadi_Loop_f.gif"));
+
                 EasterEgg.Visibility = Visibility.Visible;
                 ProgressRing.Visibility = Visibility.Hidden;
                 _easterEggIsEnabled = true;
